@@ -2,7 +2,7 @@ import hashlib
 import sys,os
 # from PIL import Image, ImageFont, ImageDraw, ImageFilter
 # import random
-import socket
+import socket, threading
 
 '''
 def store(user, secret, db):
@@ -28,16 +28,31 @@ def verify(db):
             print('密码不正确,请重新输入')
 
 
+def send_msg(dict):
+    host = '127.0.0.1'
+    port = 28956
+    addr = (host, port)
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect(addr)
+    s.send(str(dict).encode('utf-8'))
+
 def register(db):
     while True:
         username = name #input('输入你的用户名\n')
 
         user_file = open('account.txt','r')  # 打开读取用户文件                           #打开帐号文件 
         user_list = user_file.readlines()   
+        for user_line in user_list:                                     #对帐号文件进行遍历
+            (user,passwords) = user_line.strip('\n').split()             #分别获取帐号和密码信息
+            if name == user:
+                print('用户名已存在')
+                # existence = '用户已存在'
+                dict = {}
+                dict['type'] = 'p'
+                dict['msg'] = '用户已存在'
+                send_msg(dict)
+                continue
 
-        if username in db.keys():
-            print('用户名已存在，请重新输入')
-            continue
         secret = passwd # input('输入你的密码:\n')
         dicta = {'number': 0, 'lower': 0, 'upper': 0, 'other': 0}
         for item in secret:
