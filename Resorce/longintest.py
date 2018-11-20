@@ -28,7 +28,7 @@ def verify(db):
             print('密码不正确,请重新输入')
 
 
-def send_msg(dict):
+def send_back(dict):
     host = '127.0.0.1'
     port = 28956
     addr = (host, port)
@@ -45,12 +45,12 @@ def register(db):
         for user_line in user_list:                                     #对帐号文件进行遍历
             (user,passwords) = user_line.strip('\n').split()             #分别获取帐号和密码信息
             if name == user:
-                print('用户名已存在')
                 # existence = '用户已存在'
                 dict = {}
                 dict['type'] = 'p'
                 dict['msg'] = '用户已存在'
-                send_msg(dict)
+                send_back(dict)
+                print('用户名已存在')
                 continue
 
         secret = passwd # input('输入你的密码:\n')
@@ -65,8 +65,16 @@ def register(db):
             else:
                 dicta['other'] += 1
         if dicta['lower'] < 1: # or dicta['upper'] < 1 or dicta['number'] < 1 or dicta['other'] < 1:
+            dict2 = {}
+            dict2['type'] = 'p'
+            dict2['msg'] = '必须有小写字母'  
+            send_back(dict2)
             print('密码必须有大、小写字母，数字，和特殊字符四部分组成,请重新输入')
         else:
+            dict3 = {}
+            dict3['type'] = 'p'
+            dict3['msg'] = '欢迎'
+            send_back(dict3) 
             print('验证通过，欢迎光临')
             break
     return username, secret
@@ -98,7 +106,7 @@ if __name__ == '__main__':
         # receive = input()
         if strData['head'] == '0':
             print(strData)    
-            name = strData['username']
+            name = strData['username'] 
             passwd = strData['password']
 
             user, password = register(strData)
