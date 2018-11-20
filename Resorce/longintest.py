@@ -4,14 +4,11 @@ import sys,os
 # import random
 
 
-
-
 def store(user, secret, db):
     md5 = hashlib.md5()
     md5.update(secret.encode('utf-8'))
     result = md5.hexdigest()
     db[user] = result
-
 
 
 def verify(db):
@@ -58,10 +55,12 @@ def register(db):
 if __name__ == '__main__':
     while True:
         database = {'sam': '67ae79674e56657bb652bd02f7251474'}
-        receive = input('欢迎光临，输入您的身份,新用户（1），老客户（2）\n')
+        receive = input('欢迎光临，输入您的身份,新用户（1），老客户（2）,退出（exit）\n')
         if receive == '1':
             user, password = register(database)
             store(user, password, database)
             print(database)
         elif receive == '2':
             verify(database)
+        elif receive == 'exit':
+            break
