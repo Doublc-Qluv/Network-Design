@@ -2,6 +2,21 @@ import hashlib
 import sys,os
 # from PIL import Image, ImageFont, ImageDraw, ImageFilter
 # import random
+import socket
+
+#创建服务端的socket对象socketserver
+socketserver = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+host = '127.0.0.1'
+
+port =28956
+#绑定地址（包括ip地址会端口号）
+socketserver.bind((host, port))
+#设置监听
+socketserver.listen(5)
+#等待客户端的连接
+#注意：accept()函数会返回一个元组
+#元素1为客户端的socket对象，元素2为客户端的地址(ip地址，端口号)
+clientsocket,addr = socketserver.accept()
 
 
 def store(user, secret, db):
@@ -54,6 +69,11 @@ def register(db):
 
 if __name__ == '__main__':
     while True:
+        #接收客户端的请求
+        recvmsg = clientsocket.recv(1024)
+        #把接收到的数据进行解码
+        strData = eval(recvmsg.decode("utf-8"))    
+            
         database = {'sam': '67ae79674e56657bb652bd02f7251474'}
         receive = input('欢迎光临，输入您的身份,新用户（1），老客户（2）,退出（exit）\n')
         if receive == '1':
