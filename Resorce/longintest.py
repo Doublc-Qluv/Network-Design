@@ -45,12 +45,12 @@ def register(db):
         for user_line in user_list:                                     #对帐号文件进行遍历
             (user,passwords) = user_line.strip('\n').split()             #分别获取帐号和密码信息
             if name == user:
-                print('用户名已存在')
                 # existence = '用户已存在'
                 dict = {}
                 dict['type'] = 'p'
                 dict['msg'] = '用户已存在'
                 send_back(dict)
+                print('用户名已存在')
                 continue
 
         secret = passwd # input('输入你的密码:\n')
