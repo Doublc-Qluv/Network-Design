@@ -65,8 +65,15 @@ def register(db):
             else:
                 dicta['other'] += 1
         if dicta['lower'] < 1: # or dicta['upper'] < 1 or dicta['number'] < 1 or dicta['other'] < 1:
+            dict = {}
+            dict['type'] = 'p'
+            dict['msg'] = '必须有小写字母'  
+
             print('密码必须有大、小写字母，数字，和特殊字符四部分组成,请重新输入')
         else:
+            dict = {}
+            dict['type'] = 'p'
+            dict['msg'] = '欢迎' 
             print('验证通过，欢迎光临')
             break
     return username, secret
