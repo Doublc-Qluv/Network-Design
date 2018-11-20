@@ -13,6 +13,7 @@ def store(user, secret, db):
     db[user] = result
 
 
+
 def verify(db):
     while True:
         username = input('输入你的用户名\n')
