@@ -42,24 +42,20 @@ def register(db):
 
         # user_file = open('account.txt','r')  # 打开读取用户文件                           #打开帐号文件 
         
-        user_file = open('Userform', 'r')
-        user_list = user_file.readlines()
+        user_file = open('Userform', 'w')
         # temp_file = open('Usernow','w') # 将在线用户写入一个表
         jsuser = user_file.read()
         dict_userold = json.load(jsuser) # 导入旧表
         # dict.update(dict2) # 这个函数可以更新字典
 
-        for user_line in user_list:                                     #对帐号文件进行遍历
-            (user,passwords) = user_line.strip('\n').split()             #分别获取帐号和密码信息
-            if name == user:
-                # existence = '用户已存在'
-                dict = {}
-                dict['type'] = 'p'
-                dict['msg'] = '用户已存在'
-                send_back(dict)
+        for i in len(dict_userold):
+            if dict_userold['user'+ str(i)][name] == username:
+                '''dictt = {}
+                dictt['type'] = 'post'
+                dictt['msg'] = '用户已存在'
+                send_back(dictt)'''
                 print('用户名已存在')
                 continue
-
         secret = passwd # input('输入你的密码:\n')
         dicta = {'number': 0, 'lower': 0, 'upper': 0, 'other': 0}
         for item in secret:
@@ -72,19 +68,29 @@ def register(db):
             else:
                 dicta['other'] += 1
         if dicta['lower'] < 1: # or dicta['upper'] < 1 or dicta['number'] < 1 or dicta['other'] < 1:
-            dict2 = {}
-            dict2['type'] = 'p'
-            dict2['msg'] = '必须有小写字母'  
-            send_back(dict2)
+            '''dict_post2 = {}
+            dict_post2['type'] = 'post'
+            dict_post2['msg'] = '必须有小写字母'  
+            send_back(dict_post2)'''
             print('密码必须有大、小写字母，数字，和特殊字符四部分组成,请重新输入')
         else:
-            dict3 = {}
-            dict3['type'] = 'p'
-            dict3['msg'] = '欢迎'
-            send_back(dict3) 
-            print('验证通过，欢迎光临')
+            dict_post3 = {}
+            dict_post3['type'] = 'post'
+            dict_post3['msg'] = '注册成功'
+            send_back(dict_post3) 
+            print('注册成功')
+            # 存入表单
+            dict_add = {
+                'user'+str(len(dict_userold)):{
+                            'name': username,
+                            'password': secret
+                }
+            }
+            dict_userold.update(dict_add)
+            jsuser_add = json.dumps(dict_userold)
+            user_file.write(jsuser_add)
+            user_file.close()
             break
-    return username, secret
 
 
 if __name__ == '__main__':
@@ -116,11 +122,9 @@ if __name__ == '__main__':
             name = strData['username'] 
             passwd = strData['password']
 
-            user, password = register(strData)
-            # store(user, password, strData)
-            print(strData)
+            register(strData)
         elif head == '1':
             pass#verify(strData)
         else :
-            break
+            pass
     socketserver.close()

@@ -134,13 +134,15 @@ file.close()
 '''
 
 # 读取
+username = 'asdd'
+secret = '123'
 file = open('Userform', 'r') 
 js = file.read()
 dic = json.loads(js) 
-dic2 = {  
-    'user3':{  
-        'name': 'asd',
-        'password': '123' 
+dic2 = {
+    'user'+str(len(dic)):{
+                'name': username,
+                'password': secret
     }
 }
 dic.update(dic2)
@@ -148,5 +150,5 @@ dic.update(dic2)
 for i in range(4):
     print(dic['user'+str(i)])
 
-
+print(len(dic))
 file.close()
