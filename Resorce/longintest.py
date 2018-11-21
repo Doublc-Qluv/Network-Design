@@ -3,7 +3,7 @@ import sys,os
 # from PIL import Image, ImageFont, ImageDraw, ImageFilter
 # import random
 import socket, threading
-
+import json
 '''
 def store(user, secret, db):
     md5 = hashlib.md5()
@@ -41,10 +41,13 @@ def register(db):
         username = name #input('输入你的用户名\n')
 
         # user_file = open('account.txt','r')  # 打开读取用户文件                           #打开帐号文件 
-        user_list = user_file.readlines()
+        
         user_file = open('Userform', 'r')
-        temp_file = open('Usernow','w')
-
+        user_list = user_file.readlines()
+        # temp_file = open('Usernow','w') # 将在线用户写入一个表
+        jsuser = user_file.read()
+        dict_userold = json.load(jsuser) # 导入旧表
+        # dict.update(dict2) # 这个函数可以更新字典
 
         for user_line in user_list:                                     #对帐号文件进行遍历
             (user,passwords) = user_line.strip('\n').split()             #分别获取帐号和密码信息
