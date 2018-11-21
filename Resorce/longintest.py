@@ -40,8 +40,12 @@ def register(db):
     while True:
         username = name #input('输入你的用户名\n')
 
-        user_file = open('account.txt','r')  # 打开读取用户文件                           #打开帐号文件 
-        user_list = user_file.readlines()   
+        # user_file = open('account.txt','r')  # 打开读取用户文件                           #打开帐号文件 
+        user_list = user_file.readlines()
+        user_file = open('Userform', 'r')
+        temp_file = open('Usernow','w')
+
+
         for user_line in user_list:                                     #对帐号文件进行遍历
             (user,passwords) = user_line.strip('\n').split()             #分别获取帐号和密码信息
             if name == user:
