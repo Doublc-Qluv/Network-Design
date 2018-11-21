@@ -7,7 +7,7 @@ import sys,os
 # import random
 import socket, threading
 import json
-
+'''
 def register(db):
     while True:
         username = name #input('输入你的用户名\n')
@@ -71,3 +71,69 @@ if __name__ == '__main__':
         else :
             break
     socketserver.close()
+
+'''
+
+'''
+list_dict_all = []               #创建一个空列表，全局变量，用来存放字典
+def AddtoDict(str_1):            # 定义一个函数，功能：把文件里面的内容添加到字典中
+
+   list_str1 = str_1.split(" ")  # 读取的行内容以字符串的形式显示出来, 使用‘,’分隔字符串
+
+   line_str = []                 # 创建一个空列表，用来接收去掉'\n'的行字符串
+   for i in list_str1:
+       x = i.strip("\n")
+       line_str.append(x)
+   print(line_str)
+
+   dict_all = {}                         # 创建一个空字典
+   for item in line_str:                 # 遍历列表中的行内容，列表中有3个元素
+       if item[0:3] == "url":            # 列表中的元素，前3个字符是否等于“url”
+           dict = {item[0:3]: item[4:]}     # dict = {'url':'http://119.23.241.154:8080/futureloan/mvc/api/member/login'}
+           dict_all.update(dict)            # 添加dict到空字典dict_all中
+           # print(dict_all)
+       else:
+           dict = {item.split(":")[0]: item.split(":")[1]}  # 除url外，取其他数据key, value到字典中
+           dict_all.update(dict)
+   list_dict_all.append(dict_all)                     # 将字典添加到list列表中
+
+def list_dict(file_1):
+    file = open(file_1, "r+")
+    while True:
+        line = file.readline()
+        if line:
+            AddtoDict(line)
+        if not line:
+            break
+    file.close()
+    print(list_dict_all)
+
+list_dict("account.txt")        # 传入文件路径及名称即可实现将文件中的内容以[{}, {}....]的形式输出
+'''
+
+
+dic = {  
+    'user1':{  
+        'name': 'sam',
+        'password': '123' 
+    },  
+    'user0': {  
+        'name': 'root',  
+        'password': 'root'
+    },
+    'user2': {
+        'name': 'kevin',
+        'password': '123'
+    }  
+}  
+js = json.dumps(dic)   
+file = open('Userform', 'w')  
+file.write(js)  
+file.close()
+
+file = open('Userform', 'r') 
+js = file.read()
+dic = json.loads(js)   
+for i in range(2):
+    print(dic['user'+str(i)])
+file.close()
