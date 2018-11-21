@@ -133,7 +133,7 @@ file.write(js)
 file.close()
 '''
 
-# 读取
+# json读取
 username = 'asdd'
 secret = '123'
 file = open('Userform', 'r') 
@@ -150,5 +150,23 @@ dic.update(dic2)
 for i in range(4):
     print(dic['user'+str(i)])
 
-print(len(dic))
+
+length = len(dic)
+
 file.close()
+
+
+while True:
+    #username = name # input('输入你的用户名\n')
+    #secret = passwd # input('输入你的密码:\n')
+    for i in length:
+        if username not in dic:#['user'+ str(i)][name]:
+            print('用户名不存在')
+
+        if username == dic['user'+ str(i)][name]:
+            if secret == dic['user'+ str(i)][password]:
+                print('验证通过，欢迎光临')
+                break                
+            else:
+                print('密码不正确,请重新输入')
+
