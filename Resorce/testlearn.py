@@ -1,17 +1,12 @@
+# testlearn
+
 # temptest
 import hashlib
 import sys,os
 # from PIL import Image, ImageFont, ImageDraw, ImageFilter
 # import random
 import socket, threading
-
-def send_back(dict):
-    host = '127.0.0.1'
-    port = 28956
-    addr = (host, port)
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(addr)
-    s.send(str(dict).encode('utf-8'))
+import json
 
 def register(db):
     while True:
@@ -57,19 +52,9 @@ def register(db):
     return username, secret
 
 if __name__ == '__main__':
-    socketserver = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    host = '127.0.0.1'
-    port =28956
-    socketserver.bind((host, port))
-    socketserver.listen(5)
-    clientsocket,addr = socketserver.accept()
 
     while True:
-        #接收客户端的请求
-        recvmsg = clientsocket.recv(1024)
-        #把接收到的数据进行解码
-        strData = eval(recvmsg.decode("utf-8"))
-        
+
         head = strData['head']
         # stData = {'sam': '67ae79674e56657bb652bd02f7251474'}
         # receive = input()
