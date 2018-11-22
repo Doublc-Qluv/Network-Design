@@ -19,7 +19,7 @@ def verify(db):
 
     # user_file = open('account.txt','r')  # 打开读取用户文件                           #打开帐号文件 
     
-    user_file = open('Userform', 'w')
+    user_file = open('Userform', 'r')
     # temp_file = open('Usernow','w') # 将在线用户写入一个表
     jsuser = user_file.read()
     dict_userold = json.load(jsuser) # 导入旧表
