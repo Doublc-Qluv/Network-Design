@@ -13,19 +13,27 @@ def store(user, secret, db):
 '''
 
 def verify(db):
-    while True:
-        username = input('输入你的用户名\n')
-        secret = input('输入你的密码:\n')
-        md5 = hashlib.md5()
-        md5.update(secret.encode('utf-8'))
-        result = md5.hexdigest()
-        if username not in db:
-            print('用户名不存在')
-        elif db[username] == result:
-            print('验证通过，欢迎光临')
+    print(db)    
+    name = db['username'] 
+    passwd = db['password']
+
+    # user_file = open('account.txt','r')  # 打开读取用户文件                           #打开帐号文件 
+    
+    user_file = open('Userform', 'w')
+    # temp_file = open('Usernow','w') # 将在线用户写入一个表
+    jsuser = user_file.read()
+    dict_userold = json.load(jsuser) # 导入旧表
+
+    for i in range(len(dict_userold)):
+        if name not in dict_userold['user'+ str(i)]['name']:
+            print('usererror')
             break
-        else:
-            print('密码不正确,请重新输入')
+        if name in dict_userold['user'+ str(i)]['name']:
+            if passwd == dict_userold['user'+ str(i)]['password']:
+                print('yes')
+                break
+            else:
+                print('passerror')
 
 
 def send_back(dict):
@@ -37,6 +45,9 @@ def send_back(dict):
     s.send(str(dict).encode('utf-8'))
 
 def register(db):
+    print(db)    
+    name = db['username'] 
+    passwd = db['password']
     while True:
         username = name #input('输入你的用户名\n')
 
@@ -111,20 +122,15 @@ if __name__ == '__main__':
     while True:
         #接收客户端的请求
         recvmsg = clientsocket.recv(1024)
-        #把接收到的数据进行解码
-        strData = eval(recvmsg.decode("utf-8"))
-        
-        head = strData['head']
-        # strData = {'sam': '67ae79674e56657bb652bd02f7251474'}
+        #把接收到的数据进行解码 
+        dicData = eval(recvmsg.decode("utf-8"))
+        head = dicData['head']
+        # dicData = {'sam': '67ae79674e56657bb652bd02f7251474'}
         # receive = input()
-        if strData['head'] == '0':
-            print(strData)    
-            name = strData['username'] 
-            passwd = strData['password']
-
-            register(strData)
+        if dicData['head'] == '0':
+            register(dicData)
         elif head == '1':
-            pass#verify(strData)
+            verify(dicData)
         else :
             pass
     socketserver.close()
