@@ -110,7 +110,7 @@ def list_dict(file_1):
 
 list_dict("account.txt")        # 传入文件路径及名称即可实现将文件中的内容以[{}, {}....]的形式输出
 '''
-'''
+
 # 初始化
 dic = {  
     'user1':{  
@@ -131,7 +131,7 @@ file = open('Userform', 'w')
 file.write(js)
   
 file.close()
-'''
+
 '''
 # json读取
 username = 'asdd'

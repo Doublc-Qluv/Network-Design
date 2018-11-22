@@ -53,12 +53,12 @@ def register(db):
 
         # user_file = open('account.txt','r')  # 打开读取用户文件                           #打开帐号文件 
         
-        user_file = open('Userform', 'w')
+        user_file = open('Userform', 'r')
         # temp_file = open('Usernow','w') # 将在线用户写入一个表
         jsuser = user_file.read()
         dict_userold = json.load(jsuser) # 导入旧表
         # dict.update(dict2) # 这个函数可以更新字典
-
+        user_file.close()
         for i in len(dict_userold):
             if dict_userold['user'+ str(i)][name] == username:
                 '''dictt = {}
@@ -85,10 +85,10 @@ def register(db):
             send_back(dict_post2)'''
             print('密码必须有大、小写字母，数字，和特殊字符四部分组成,请重新输入')
         else:
-            dict_post3 = {}
+            '''dict_post3 = {}
             dict_post3['type'] = 'post'
             dict_post3['msg'] = '注册成功'
-            send_back(dict_post3) 
+            send_back(dict_post3) '''
             print('注册成功')
             # 存入表单
             dict_add = {
@@ -99,8 +99,9 @@ def register(db):
             }
             dict_userold.update(dict_add)
             jsuser_add = json.dumps(dict_userold)
-            user_file.write(jsuser_add)
-            user_file.close()
+            user_file2 = open('Userform', 'w') 
+            user_file2.write(jsuser_add)
+            user_file2.close()
             break
 
 
@@ -117,20 +118,22 @@ if __name__ == '__main__':
     #等待客户端的连接
     #注意：accept()函数会返回一个元组
     #元素1为客户端的socket对象，元素2为客户端的地址(ip地址，端口号)
-    clientsocket,addr = socketserver.accept()
+    
 
     while True:
+        clientsocket,addr = socketserver.accept()
         #接收客户端的请求
         recvmsg = clientsocket.recv(1024)
         #把接收到的数据进行解码 
         dicData = eval(recvmsg.decode("utf-8"))
-        head = dicData['head']
         # dicData = {'sam': '67ae79674e56657bb652bd02f7251474'}
         # receive = input()
-        if dicData['head'] == '0':
+        print("收到:",dicData)
+        if dicData['head'] == 0:
+            print('yes')
             register(dicData)
-        elif head == '1':
+        elif dicData['head'] == 1:
             verify(dicData)
-        else :
+        else:
             pass
     socketserver.close()
