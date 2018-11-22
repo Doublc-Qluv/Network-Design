@@ -154,12 +154,13 @@ for i in range(4):
 length = len(dic)
 
 file.close()
-
+print(dict.values(dic['user0']))
 
 #while True:
     #username = name # input('输入你的用户名\n')
     #secret = passwd # input('输入你的密码:\n')
-for i in range(4):#range(length):
+'''for n in range(length):
+
     if username == dic['user'+ str(i)]['name']:
         if secret == dic['user'+ str(i)]['password']:
             print('验证通过，欢迎光临')
@@ -168,4 +169,5 @@ for i in range(4):#range(length):
             print('密码不正确,请重新输入')
             continue
     else :
-        print('yonghuminn不正确,请重新输入')
+        print('用户名不正确,请重新输入')'''
+    
