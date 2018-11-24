@@ -34,7 +34,7 @@ def verify(db):
     for i in range(len(dict_userold)):
         if name not in dict_userold['user'+ str(i)]['name']:
             dict_passverify = {}
-            dict_passverify['head'] = 'login'
+            dict_passverify['Head'] = 'login'
             dict_passverify['type'] = 'GET'        
             dict_passverify['Flag'] = 0
             dict_passverify['content'] = 'usererror'
@@ -45,7 +45,7 @@ def verify(db):
         if name in dict_userold['user'+ str(i)]['name']:
             if passwd == dict_userold['user'+ str(i)]['password']:
                 dict_passverify = {}
-                dict_passverify['head'] = 'login'
+                dict_passverify['Head'] = 'login'
                 dict_passverify['type'] = 'GET'        
                 dict_passverify['Flag'] = 1
                 dict_passverify['content'] = 'welcome'
@@ -54,7 +54,7 @@ def verify(db):
                 break
             else:
                 dict_passverify = {}
-                dict_passverify['head'] = 'login'
+                dict_passverify['Head'] = 'login'
                 dict_passverify['type'] = 'GET'        
                 dict_passverify['Flag'] = 0
                 dict_passverify['content'] = 'passerror'
@@ -79,7 +79,7 @@ def register(db):
     for i in range(len(dict_userold)):
         if dict_userold['user'+ str(i)]['name'] == username:
             dict_existence = {}
-            dict_existence['head'] = 'register'
+            dict_existence['Head'] = 'register'
             dict_existence['type'] = 'GET'
             dict_existence['Flag'] = 0
             dict_existence['content'] = '用户已存在'
@@ -98,7 +98,7 @@ def register(db):
         else:
             dicta['other'] += 1
     dict_passverify = {}
-    dict_passverify['head'] = 'register'
+    dict_passverify['Head'] = 'register'
     dict_passverify['type'] = 'GET'
 
     if dicta['number'] + dicta['lower'] + dicta['upper'] + dicta['other'] < 4:
@@ -155,10 +155,10 @@ if __name__ == '__main__':
         # receive = input()
         dicData = dict(dicData)
         print("收到:",dicData)
-        if dicData['head'] == 0:
+        if dicData['Head'] == 'register':
             print('yes')
             register(dicData)
-        elif dicData['head'] == 1:
+        elif dicData['Head'] == 'login':
             verify(dicData)
         else:
             pass
