@@ -74,6 +74,7 @@ if __name__ == '__main__':
 
 '''
 
+
 '''
 list_dict_all = []               #创建一个空列表，全局变量，用来存放字典
 def AddtoDict(str_1):            # 定义一个函数，功能：把文件里面的内容添加到字典中
@@ -111,6 +112,7 @@ def list_dict(file_1):
 list_dict("account.txt")        # 传入文件路径及名称即可实现将文件中的内容以[{}, {}....]的形式输出
 '''
 
+'''
 # 初始化
 dic = {  
     'user1':{  
@@ -131,8 +133,8 @@ file = open('Userform', 'w')
 file.write(js)
   
 file.close()
-
 '''
+
 # json读取
 username = 'asdd'
 secret = '123'
@@ -156,6 +158,8 @@ length = len(dic)
 file.close()
 
 listd = dict.values(dic)
+print(str(dic['user'+ str(0)]['name']))
+
 '''
 # print(dic['user0'].get('name')) # 字典的键找到值
 
@@ -165,7 +169,8 @@ listd = dict.values(dic)
 #while True:
     #username = name # input('输入你的用户名\n')
     #secret = passwd # input('输入你的密码:\n')
-'''for n in range(length):
+
+for n in range(length):
 
     if username == dic['user'+ str(i)]['name']:
         if secret == dic['user'+ str(i)]['password']:
@@ -188,8 +193,7 @@ for i in range(len(dic)):
             break
         else:
             print('passerror')
-'''
-'''    
+  
 radiansdict.clear()    #删除字典内所有元素
 radiansdict.copy()    #返回一个字典的浅复制
 radiansdict.fromkeys()    #创建一个新字典，以序列seq中元素做字典的键，val为字典所有键对应的初始值
@@ -201,4 +205,3 @@ radiansdict.setdefault(key, default=None)    #和get()类似, 但如果键不已
 radiansdict.update(dict2)    #把字典dict2的键/值对更新到dict里
 radiansdict.values()    #以列表返回字典中的所有值
 '''
-
