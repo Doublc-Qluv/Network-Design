@@ -21,4 +21,4 @@ length = len(dic)
 file.close()
 
 listd = dict.values(dic)
-print(str(dic['user'+ str(0)]['name'])
+print(str(dic['user'+ str(0)]['name']))

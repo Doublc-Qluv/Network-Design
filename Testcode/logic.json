@@ -1,0 +1,16 @@
+{
+    "Head":"register/login/message/file" , 
+    "type":"POST/GET" , 
+    "Flag":"0/1",
+    "content":"empty/",
+    "username":"",
+    "password":"",
+
+
+
+    "Head":"message",
+    "Src_name":"",
+    "Dst_name":"",
+    "Size":"",
+    "msg":""
+}

@@ -127,7 +127,7 @@ def send(dict):
     s.connect(addr)
     s.send(str(dict).encode('utf-8'))
     return 1
-
+'''
 class send(object):
     def __init__(self,master=None):
         self.message=master
@@ -139,7 +139,7 @@ class send(object):
         self.s=sk.socket(sk.AF_INET,sk.SOCK_STREAM)
         self.s.connect(self.addr)
         s.send(str(dict).encode('utf-8'))
-        
+        '''
         
 
 
