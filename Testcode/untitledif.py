@@ -70,7 +70,7 @@ class Login_reginster_Page(object):
         
     def RegisterCheck(self):
         self.message()
-        self.dict['head']=0
+        self.dict['Head']='register'
         if self.dict['username'] and self.dict['password']:
             try:
                 state=send(self.dict)
@@ -89,7 +89,7 @@ class Login_reginster_Page(object):
     
     def loginCheck(self):
         self.message()
-        self.dict['head']=1
+        self.dict['Head']='login'
         if self.dict['username'] and self.dict['password']:
             try:
                 state=send(self.dict)
