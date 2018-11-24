@@ -123,6 +123,7 @@ class Login_reginster_Page(object):
     #注册登陆消息
     def message_content(self):
         self.dict={}
+<<<<<<< HEAD
         self.dict['username']=self.username.get()    #注册或登陆的用户名
         self.dict['password']=self.password.get()    #注册或登陆的密码
         self.dict['time']=ctime()     #注册或登陆时的时间
@@ -132,6 +133,21 @@ class Login_reginster_Page(object):
 
 
 #消息发送
+=======
+        self.dict['username']=self.username.get()
+        self.dict['password']=self.password.get()
+        self.dict['time']=ctime()
+    
+def send(dict):
+    host='127.0.0.1'
+    port=28956
+    addr=(host,port)
+    s=sk.socket(sk.AF_INET,sk.SOCK_STREAM)
+    s.connect(addr)
+    s.send(str(dict).encode('utf-8'))
+    return 1
+'''
+>>>>>>> 3cb0b1a69a77dada013724d0b1c86fc663aba1a7
 class send(object):
     def __init__(self,master=None):
         self.message=master
@@ -143,10 +159,15 @@ class send(object):
     def send_register_login(self):
         self.s=sk.socket(sk.AF_INET,sk.SOCK_STREAM)
         self.s.connect(self.addr)
+<<<<<<< HEAD
         self.s.send(self.message.encode('utf-8'))
         self.return_message=self.s.recv(1024)
         return eval(self.return_message.decode('utf-8'))
         
+=======
+        s.send(str(dict).encode('utf-8'))
+        '''
+>>>>>>> 3cb0b1a69a77dada013724d0b1c86fc663aba1a7
         
 
 
