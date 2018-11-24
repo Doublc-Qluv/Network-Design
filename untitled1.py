@@ -83,7 +83,11 @@ class Login_reginster_Page(object):
         self.dict['Head']='register'
         if self.dict['username'] and self.dict['password']:
             try:
-                self.state=send.send_register_login(self.dict)
+                #self.state=send.send_register_login(self.dict)
+                a=send(self.dict)
+                self.state=a.send_register_login()
+                #self.state=a.return_message
+                print(self.state)
             except:
                 showwarning(title='注册失败',message="网络连接不好")
             else:
@@ -104,7 +108,7 @@ class Login_reginster_Page(object):
         self.dict['Head']='login'     #标识消息类型为：登陆验证消息
         if self.dict['username'] and self.dict['password']:
             try:
-                self.state=send.send_register_login(self.dict)
+                self.state=send(self.dict)
             except:
                 showwarning(title='登陆失败',message="网络连接不好")
             else:
@@ -123,32 +127,33 @@ class Login_reginster_Page(object):
     #注册登陆消息
     def message_content(self):
         self.dict={}
-        self.dict['username']=self.username.get()
-        self.dict['password']=self.password.get()
-        self.dict['time']=ctime()
-    
-def send(dict):
-    host='127.0.0.1'
-    port=28956
-    addr=(host,port)
-    s=sk.socket(sk.AF_INET,sk.SOCK_STREAM)
-    s.connect(addr)
-    s.send(str(dict).encode('utf-8'))
-    return 1
-'''
+        self.dict['username']=self.username.get()    #注册或登陆的用户名
+        self.dict['password']=self.password.get()    #注册或登陆的密码
+        self.dict['time']=ctime()     #注册或登陆时的时间
+        self.dict['type']='POST'      #消息类型
+
+
+
+
+#消息发送
 class send(object):
     def __init__(self,master=None):
-        self.message=master
+        self.message=str(master)
         self.host='127.0.0.1'
         self.port=28956
         self.addr=(self.host,self.port)
+        #self.send_register_login()
     
     #注册登陆消息发送
     def send_register_login(self):
         self.s=sk.socket(sk.AF_INET,sk.SOCK_STREAM)
         self.s.connect(self.addr)
-        s.send(str(dict).encode('utf-8'))
-        '''
+        self.s.send(self.message.encode('utf-8'))
+        self.return_message=eval(self.s.recv(1024).decode('utf-8'))
+        #print(eval(self.return_message.decode('utf-8')))
+        #return eval(self.return_message.decode('utf-8'))
+        return self.return_message
+        
         
 
 

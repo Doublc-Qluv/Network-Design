@@ -11,6 +11,8 @@ def store(user, secret, db):
     result = md5.hexdigest()
     db[user] = result
 '''
+
+"""
 def send_back(dict):
     host = '127.0.0.1'
     port = 28956
@@ -18,6 +20,7 @@ def send_back(dict):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect(addr)
     s.send(str(dict).encode('utf-8'))
+"""
 
 def verify(db):
     print(db)    
@@ -38,7 +41,7 @@ def verify(db):
             dict_passverify['type'] = 'GET'        
             dict_passverify['Flag'] = 0
             dict_passverify['content'] = 'usererror'
-            send_back(dict_passverify)
+            #send_back(dict_passverify)
 
             print('usererror')
             break
@@ -49,7 +52,7 @@ def verify(db):
                 dict_passverify['type'] = 'GET'        
                 dict_passverify['Flag'] = 1
                 dict_passverify['content'] = 'welcome'
-                send_back(dict_passverify)
+                #send_back(dict_passverify)
                 print('welcome')
                 break
             else:
@@ -59,6 +62,7 @@ def verify(db):
                 dict_passverify['Flag'] = 0
                 dict_passverify['content'] = 'passerror'
                 print('passerror')
+    return dict_passverify
 
 
 
@@ -83,51 +87,57 @@ def register(db):
             dict_existence['type'] = 'GET'
             dict_existence['Flag'] = 0
             dict_existence['content'] = '用户已存在'
-            send_back(dict_existence)
+            #send_back(dict_existence)
             print('用户名已存在')
+            flag=0
             break
-    secret = passwd # input('输入你的密码:\n')
-    dicta = {'number': 0, 'lower': 0, 'upper': 0, 'other': 0}
-    for item in secret:
-        if item.isdigit():
-            dicta['number'] += 1
-        elif item.islower():
-            dicta['lower'] += 1
-        elif item.isupper():
-            dicta['upper'] += 1
         else:
-            dicta['other'] += 1
-    dict_passverify = {}
-    dict_passverify['Head'] = 'register'
-    dict_passverify['type'] = 'GET'
+            flag=1
+    if flag:
+        secret = passwd # input('输入你的密码:\n')
+        dicta = {'number': 0, 'lower': 0, 'upper': 0, 'other': 0}
+        for item in secret:
+            if item.isdigit():
+                dicta['number'] += 1
+            elif item.islower():
+                dicta['lower'] += 1
+            elif item.isupper():
+                dicta['upper'] += 1
+            else:
+                dicta['other'] += 1
+            dict_passverify = {}
+            dict_passverify['Head'] = 'register'
+            dict_passverify['type'] = 'GET'
 
-    if dicta['number'] + dicta['lower'] + dicta['upper'] + dicta['other'] < 4:
-        dict_passverify['Flag'] = 0
-        dict_passverify['content'] = '密码至少大于四位'
-        send_back(dict_passverify)
-        print('密码至少大于四位')
-    elif dicta['lower'] < 1 or dicta['number'] < 1 : # or dicta['upper'] < 1 or dicta['other'] < 1: 
-        dict_passverify['Flag'] = 0
-        dict_passverify['content'] = '密码至少要有一个小写字母以及一个数字'
-        send_back(dict_passverify)
-        print('密码至少要有一个小写字母以及一个数字')
-    else:
-        dict_passverify['Flag'] = 1
-        dict_passverify['content'] = '注册成功'
-        send_back(dict_passverify)
-        print('注册成功')
-        # 存入表单
-        dict_add = {
-            'user'+str(len(dict_userold)):{
+        if dicta['number'] + dicta['lower'] + dicta['upper'] + dicta['other'] < 4:
+            dict_passverify['Flag'] = 0
+            dict_passverify['content'] = '密码至少大于四位'
+            #send_back(dict_passverify)
+            print('密码至少大于四位')
+        elif dicta['lower'] < 1 or dicta['number'] < 1 : # or dicta['upper'] < 1 or dicta['other'] < 1: 
+            dict_passverify['Flag'] = 0
+            dict_passverify['content'] = '密码至少要有一个小写字母以及一个数字'
+            #send_back(dict_passverify)
+            print('密码至少要有一个小写字母以及一个数字')
+        else:
+            dict_passverify['Flag'] = 1
+            dict_passverify['content'] = '注册成功'
+            #send_back(dict_passverify)
+            print('注册成功')
+            # 存入表单
+            dict_add = {
+                'user'+str(len(dict_userold)):{
                         'name': username,
                         'password': secret
-            }
-        }
-        dict_userold.update(dict_add)
-        jsuser_add = json.dumps(dict_userold)
-        user_file2 = open('Userform', 'w') 
-        user_file2.write(jsuser_add)
-        user_file2.close()
+                        }
+                }
+            dict_userold.update(dict_add)
+            jsuser_add = json.dumps(dict_userold)
+            user_file2 = open('Userform', 'w') 
+            user_file2.write(jsuser_add)
+            user_file2.close()
+    return dict_passverify
+    
 
 
 if __name__ == '__main__':
@@ -143,23 +153,27 @@ if __name__ == '__main__':
     #等待客户端的连接
     #注意：accept()函数会返回一个元组
     #元素1为客户端的socket对象，元素2为客户端的地址(ip地址，端口号)
-    clientsocket,addr = socketserver.accept()
+    #clientsocket,addr = socketserver.accept()
 
     while True:
-        
+        clientsocket,addr = socketserver.accept()
         #接收客户端的请求
         recvmsg = clientsocket.recv(1024)
         #把接收到的数据进行解码 
-        dicData = eval(recvmsg.decode("utf-8"))
+        dicData = eval(recvmsg.decode('utf-8'))
         # dicData = {'sam': '67ae79674e56657bb652bd02f7251474'}
         # receive = input()
         dicData = dict(dicData)
         print("收到:",dicData)
         if dicData['Head'] == 'register':
             print('yes')
-            register(dicData)
+            a=register(dicData)
+            print(a)
+            clientsocket.send(str(a).encode('utf-8'))
         elif dicData['Head'] == 'login':
-            verify(dicData)
+            a=verify(dicData)
+            clientsocket.send(str(a).encode('utf-8'))
         else:
             pass
+        
     socketserver.close()
