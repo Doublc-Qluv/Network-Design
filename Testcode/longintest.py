@@ -26,6 +26,7 @@ def verify(db):
 
     for i in range(len(dict_userold)):
         if name not in dict_userold['user'+ str(i)]['name']:
+            pass 
             print('usererror')
             break
         if name in dict_userold['user'+ str(i)]['name']:
