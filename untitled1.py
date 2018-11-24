@@ -26,6 +26,7 @@ class Login_reginster_Page(object):
         self.password=tk.StringVar()
         self.LoginPage()
     
+    #登陆界面
     def LoginPage(self):
         self.root.title("登陆界面")
         self.page1=tk.Frame(self.root,height=120,width=300)   ##frame框架的大小必须写
@@ -54,14 +55,16 @@ class Login_reginster_Page(object):
         tk.Button(self.page2,text='注册',fg='blue',command=self.RegisterChange).place(x=70,y=50)
         tk.Button(self.page2,text='登陆',fg='red',command=self.loginCheck).place(x=180,y=50)
         tk.Label(self.page2,text='请登录',fg='green').place(x=100,y=15)
-        
+    
+    #注册界面
     def RegisterPage(self):
         self.root.title("注册界面")
         self.page3=tk.Frame(self.root,height=100,width=300)
         self.page3.place(x=0,y=120)
         tk.Button(self.page3,text='登陆',fg='red',command=self.LoginChange).place(x=70,y=50)
         tk.Button(self.page3,text='注册',fg='blue',command=self.RegisterCheck).place(x=180,y=50)
-        tk.Label(self.page3,text='请注册',fg='green').place(x=100,y=15)
+        tk.Label(self.page3,text="*密码至少要有一个小写字母和一个数字，且长度大于4",fg='purple').place(x=2,y=10)
+        tk.Label(self.page3,text='请注册',fg='green').place(x=100,y=30)
         
     def LoginChange(self):
         self.page3.destroy()
@@ -76,58 +79,59 @@ class Login_reginster_Page(object):
         self.RegisterPage()
                 
     def RegisterCheck(self):
-        self.message()
-        self.dict['head']=0
+        self.message_content()
+        self.dict['Head']='register'
         if self.dict['username'] and self.dict['password']:
             try:
-                state=send(self.dict)
+                self.state=send.send_register_login(self.dict)
             except:
                 showwarning(title='注册失败',message="网络连接不好")
             else:
-                if state:
+                if self.state['Flag']:
                     self.LoginChange()
-                    showinfo(title="注册成功",message='请登陆！')
+                    if self.state['content']:
+                        showinfo(title="注册成功",message=self.state['content'])
                 else:
                     del self.dict
-                    showerror(title="注册失败！",message="你的用户名和密码不符合注册规则！")
+                    if self.state['content']:
+                        showerror(title="注册失败！",message=self.state['content'])
         else:
             showerror(message='你没有输入用户名或密码！')
     
-    
+    #登陆命令
     def loginCheck(self):
-        self.message()
-        self.dict['head']=1
+        self.message_content()
+        self.dict['Head']='login'     #标识消息类型为：登陆验证消息
         if self.dict['username'] and self.dict['password']:
             try:
-                state=send(self.dict)
+                self.state=send.send_register_login(self.dict)
             except:
                 showwarning(title='登陆失败',message="网络连接不好")
             else:
-                if state:
+                if self.state['Flag']:
                     self.page1.destroy()
                     self.page2.destroy()
                     #time.sleep(1)
                     MainPage(self.root)
                 else:
                     del self.dict
-                    showerror(title="登陆失败！",message="你的用户名或密码错误！")
+                    if self.state['content']:
+                        showerror(title="登陆失败！",message=self.state['content'])
         else:
             showerror(title='登陆失败',message='你没有输入用户名或密码！')
-    def message(self):
+            
+    #注册登陆消息
+    def message_content(self):
         self.dict={}
-        self.dict['username']=self.username.get()
-        self.dict['password']=self.password.get()
-        self.dict['time']=ctime()
-    
-def send(dict):
-    host='127.0.0.1'
-    port=28956
-    addr=(host,port)
-    s=sk.socket(sk.AF_INET,sk.SOCK_STREAM)
-    s.connect(addr)
-    s.send(str(dict).encode('utf-8'))
-    return 1
+        self.dict['username']=self.username.get()    #注册或登陆的用户名
+        self.dict['password']=self.password.get()    #注册或登陆的密码
+        self.dict['time']=ctime()     #注册或登陆时的时间
+        self.dict['type']='POST'      #消息类型
 
+
+
+
+#消息发送
 class send(object):
     def __init__(self,master=None):
         self.message=master
@@ -135,10 +139,13 @@ class send(object):
         self.port=28956
         self.addr=(self.host,self.port)
     
-    def send(self):
+    #注册登陆消息发送
+    def send_register_login(self):
         self.s=sk.socket(sk.AF_INET,sk.SOCK_STREAM)
         self.s.connect(self.addr)
-        s.send(str(dict).encode('utf-8'))
+        self.s.send(self.message.encode('utf-8'))
+        self.return_message=self.s.recv(1024)
+        return eval(self.return_message.decode('utf-8'))
         
         
 
@@ -295,6 +302,3 @@ if __name__=="__main__":
     #MainPage(root)
     root.mainloop()
         
-
-
-
