@@ -143,10 +143,10 @@ if __name__ == '__main__':
     #等待客户端的连接
     #注意：accept()函数会返回一个元组
     #元素1为客户端的socket对象，元素2为客户端的地址(ip地址，端口号)
-    
+    clientsocket,addr = socketserver.accept()
 
     while True:
-        clientsocket,addr = socketserver.accept()
+        
         #接收客户端的请求
         recvmsg = clientsocket.recv(1024)
         #把接收到的数据进行解码 

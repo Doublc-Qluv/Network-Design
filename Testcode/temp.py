@@ -1,24 +1,17 @@
-# temp
-username = 'asdd'
-secret = '123'
-file = open('Userform', 'r') 
-js = file.read()
-dic = json.loads(js) 
-dic2 = {
-    'user'+str(len(dic)):{
-                'name': username,
-                'password': secret
-    }
-}
-dic.update(dic2)
+import time, threading
 
-for i in range(4):
-    print(dic['user'+str(i)])
+# 新线程执行的代码:
+def loop():
+    print('thread %s is running...' % threading.current_thread().name)
+    n = 0
+    while n < 5:
+        n = n + 1
+        print('thread %s >>> %s' % (threading.current_thread().name, n))
+        time.sleep(1)
+    print('thread %s ended.' % threading.current_thread().name)
 
-print('\n\n')
-length = len(dic)
-
-file.close()
-
-listd = dict.values(dic)
-print(str(dic['user'+ str(0)]['name']))
+print('thread %s is running...' % threading.current_thread().name)
+t = threading.Thread(target=loop, name='LoopThread')
+t.start()
+t.join()
+print('thread %s ended.' % threading.current_thread().name)
