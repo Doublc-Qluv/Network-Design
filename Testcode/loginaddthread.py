@@ -29,32 +29,31 @@ def verify(db):
     passwd = db['password']
     # user_file = open('account.txt','r')  # 打开读取用户文件
     user_file = open('Userform', 'r')
-    # temp_file = open('Usernow','w') # 将在线用户写入一个表
+    # temp_file = open('Usernow','a+') # 将登陆用户写入一个表
     jsuser = user_file.read()
     dict_userold = json.loads(jsuser) # 导入旧表
     dict_passverify = {}
     dict_passverify['Head'] = 'login'
     dict_passverify['type'] = 'GET' 
+    print(len(dict_userold))
     flag = 0
     for i in range(len(dict_userold)):
-        if name not in str(dict_userold['user'+ str(i)]['name']):
-            dict_passverify['Flag'] = 0
-            dict_passverify['content'] = 'usererror'
+        print(dict_userold['user'+ str(i)]['name'])
+        if name == dict_userold['user'+ str(i)]['name'] and passwd == dict_userold['user'+ str(i)]['password']:
+            dict_passverify['Flag'] = 1
+            dict_passverify['content'] = 'welcome'
             #send_back(dict_passverify)
-            print('usererror')
+            print('welcome')
+            # temp_file = open('Usernow','a+') # 将登陆用户写入一个表
+            flag = 1
+            break                
         else:
-            flag=1
-        if flag:
-            if passwd == dict_userold['user'+ str(i)]['password']:    
-                dict_passverify['Flag'] = 1
-                dict_passverify['content'] = 'welcome'
-                #send_back(dict_passverify)
-                print('welcome')
-            else:    
-                dict_passverify['Flag'] = 0
-                dict_passverify['content'] = 'passerror'
-                print('passerror')
-        break
+            dict_passverify['Flag'] = 0
+            dict_passverify['content'] = 'user-or-password-error'
+            #send_back(dict_passverify)
+            print('user-or-password-error')
+            continue
+               
     return dict_passverify
 
 
@@ -129,6 +128,19 @@ def register(db):
             user_file2.write(jsuser_add)
             user_file2.close()
     return dict_register
+def relist_all():
+    pass
+    file = open('Userform', 'r') 
+    js = file.read()
+    dic = json.loads(js)
+    for i in range(len(dic)):
+        dicnew = {
+            'user'+str(i):dic['user'+str(i)]['name']
+        }
+        dic.update(dicnew)
+    print(dic)
+    return dic
+
 def community(sockets,useron):
     pass
     '''
@@ -146,8 +158,8 @@ def community(sockets,useron):
             print('%s logout' % useron)
             break
         elif re.match('to: +', datarecv) is not None: #选择通信对象
+            pass
             
-
 def start():
     #创建服务端的socket对象socketserver
     socketserver = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -184,6 +196,8 @@ def start():
             print(a)
             # 开始工作
             # run()
+        elif dicData['Head'] == 'UserNameList':
+            print(relist_all())
         else:
             pass
         #clientsocket.send(str(a).encode('utf-8'))
