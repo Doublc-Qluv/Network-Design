@@ -123,7 +123,7 @@ class Login_reginster_Page(object):
                     self.page1.destroy()
                     self.page2.destroy()
                     time.sleep(1)
-                    MainPage(self.root)
+                    MainPage(self.root,self.service_socket)
                 else:
                     #登陆失败后，清空消息框，和已经发送消息的内容
                     del self.dict
@@ -136,7 +136,8 @@ class Login_reginster_Page(object):
 
 #登陆后的界面
 class MainPage(object):
-    def __init__(self,master=None):
+    def __init__(self,master=None,service_socket=None):
+        self.service_socket=service_socket
         self.root=master
         self.root.geometry("%dx%d"%(800,600))
         self.root.title("聊天程序实例")
