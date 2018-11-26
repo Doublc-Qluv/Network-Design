@@ -52,4 +52,16 @@ Size=21*
 msg=''
 """
 
+"""
+#联系人
 
+#客户端请求联系人信息
+Head='UserNameList'
+type='POST'
+
+#服务器返回联系人信息
+Head='UserNameList'
+type='GET'
+ActiveUserList='[]'
+WholeUserList='[]'
+"""
