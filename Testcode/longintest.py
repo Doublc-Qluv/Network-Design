@@ -175,5 +175,5 @@ if __name__ == '__main__':
             clientsocket.send(str(a).encode('utf-8'))
         else:
             pass
-        
+        #clientsocket.send(str(a).encode('utf-8'))
     socketserver.close()
