@@ -146,7 +146,7 @@ def community(sockets,useron):
             print('%s logout' % useron)
             break
         elif re.match('to: +', datarecv) is not None: #选择通信对象
-            pass 
+            
 
 def start():
     #创建服务端的socket对象socketserver
