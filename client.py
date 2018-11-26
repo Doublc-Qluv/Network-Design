@@ -25,6 +25,7 @@ class Login_reginster_Page(object):
         self.root.geometry('%dx%d'%(300,220))
         self.username=tk.StringVar()
         self.password=tk.StringVar()
+        self.service_socket=None
         self.LoginPage()
     
     #登陆界面
@@ -39,6 +40,7 @@ class Login_reginster_Page(object):
         self.colour=['green','blue','red','organe','yellow','purple']
         #self.page1['bg']=colour[x]
         title=tk.Label(self.page1,text='欢迎使用我们的聊天应用！')
+        #滚动标题的动态效果
         def foo():
             self.remove=self.remove+10
             if self.remove>300:
@@ -47,6 +49,7 @@ class Login_reginster_Page(object):
             title['fg']=self.colour[self.remove%(len(self.colour))]
             self.page1.after(500,foo)
         self.page1.after(500,foo)
+        #登陆框界面设计
         tk.Label(self.page1,width=6,text='用户名').place(x=20,y=50)
         self.user=tk.Entry(self.page1,width=18,textvariable=self.username)
         self.user.place(x=70,y=50)
@@ -80,14 +83,14 @@ class Login_reginster_Page(object):
         self.RegisterPage()
                 
     def RegisterCheck(self):
-        self.message_content()
-        self.dict['Head']='register'
+        self.dict=require_data_type().registr_type(self.username.get(),self.password.get())
         if self.dict['username'] and self.dict['password']:
             try:
-                #self.state=send.send_register_login(self.dict)
-                a=send(self.dict)
-                self.state=a.send_register_login()
+                #self.state=send.send_register_login(self.dict)    这种类的函数引用错去
+                #a=send(self.dict)
+                #self.state=a.send_register_login()
                 #self.state=a.return_message
+                self.state=send_register_login(self.dict).register_updata()
                 print(self.state)
             except:
                 showwarning(title='注册失败',message="网络连接不好")
@@ -97,7 +100,10 @@ class Login_reginster_Page(object):
                     if self.state['content']:
                         showinfo(title="注册成功",message=self.state['content'])
                 else:
+                    #注册失败后，清空消息框，和已经发送消息内容
                     del self.dict
+                    self.pw.delete(0,tk.END)
+                    self.user.delete(0,tk.END)
                     if self.state['content']:
                         showerror(title="注册失败！",message=self.state['content'])
         else:
@@ -105,59 +111,35 @@ class Login_reginster_Page(object):
     
     #登陆命令
     def loginCheck(self):
-        self.message_content()
-        self.dict['Head']='login'     #标识消息类型为：登陆验证消息
+        self.dict=require_data_type().login_type(self.username.get(),self.password.get())
         if self.dict['username'] and self.dict['password']:
             try:
+<<<<<<< HEAD:untitled1.py
                 self.state=send(self.dict).send_register_login()
                 print(self.state)
+=======
+                #self.state=send(self.dict)    这种也错误，类本身没有返回值
+                #self.state=send(self.dict).send_register_login()                
+                self.state,self.service_socket=send_register_login(self.dict).login_updata()
+                #类的函数两种不同的引用方式
+>>>>>>> 36b9c2d023e7c2dd1b1c8db3037ea5a77f6378df:client.py
             except:
                 showwarning(title='登陆失败',message="网络连接不好")
             else:
                 if self.state['Flag']:
                     self.page1.destroy()
                     self.page2.destroy()
-                    #time.sleep(1)
+                    time.sleep(1)
                     MainPage(self.root)
                 else:
+                    #登陆失败后，清空消息框，和已经发送消息的内容
                     del self.dict
+                    self.pw.delete(0,tk.END)
+                    self.user.delete(0,tk.END)
                     if self.state['content']:
                         showerror(title="登陆失败！",message=self.state['content'])
         else:
             showerror(title='登陆失败',message='你没有输入用户名或密码！')
-            
-    #注册登陆消息
-    def message_content(self):
-        self.dict={}
-        self.dict['username']=self.username.get()    #注册或登陆的用户名
-        self.dict['password']=self.password.get()    #注册或登陆的密码
-        self.dict['time']=ctime()     #注册或登陆时的时间
-        self.dict['type']='POST'      #消息类型
-
-
-
-
-#消息发送
-class send(object):
-    def __init__(self,master=None):
-        self.message=str(master)
-        self.host='127.0.0.1'
-        self.port=28956
-        self.addr=(self.host,self.port)
-        #self.send_register_login()
-    
-    #注册登陆消息发送
-    def send_register_login(self):
-        self.s=sk.socket(sk.AF_INET,sk.SOCK_STREAM)
-        self.s.connect(self.addr)
-        self.s.send(self.message.encode('utf-8'))
-        self.return_message=eval(self.s.recv(1024).decode('utf-8'))
-        #print(eval(self.return_message.decode('utf-8')))
-        #return eval(self.return_message.decode('utf-8'))
-        return self.return_message
-        
-        
-
 
 #登陆后的界面
 class MainPage(object):
@@ -242,6 +224,7 @@ class user_frame(tk.Frame):   #继承frame类
     
     #向服务器请求更新用户信息
     def require_user_data(self):
+
         self.active_user=['aaaa','bbb','ccc']
         self.whole_user=['1111','2222','3333','aaaa','bbb','ccc']
         self.after(5000,self.require_user_data)
@@ -252,6 +235,9 @@ class user_frame(tk.Frame):   #继承frame类
         #time.sleep(10)
         self.message_page[1].message_list.insert(tk.END,ctime())
         self.message_page[1].show_message_frame.after(10000,self.message_update)
+
+
+
 
 #消息框与文本框界面设计
 class message_frame(tk.Frame):
@@ -304,6 +290,93 @@ class About_me(tk.Frame):
         #sys.exit()
         pass
 
+
+#与服务器通信进行注册和登陆
+class send_register_login(object):
+    def __init__(self,master=None):
+        self.message=str(master)
+        self.host='127.0.0.1'
+        self.port=28956
+        self.addr=(self.host,self.port)
+        self.service_socket=None
+        #self.send_register_login()
+    
+    #登陆消息发送
+    def login_updata(self):
+        self.s=sk.socket(sk.AF_INET,sk.SOCK_STREAM)
+        self.s.connect(self.addr)
+        self.s.send(self.message.encode('utf-8'))
+        self.return_message=eval(self.s.recv(1024).decode('utf-8'))
+        self.service_socket=self.s
+        return self.return_message,self.service_socket
+
+    #注册消息发送
+    def register_updata(self):
+        self.s=sk.socket(sk.AF_INET,sk.SOCK_STREAM)
+        self.s.connect(self.addr)
+        self.s.send(self.message.encode('utf-8'))
+        self.return_message=eval(self.s.recv(1024).decode('utf-8'))
+        self.s.close()
+        self.service_socket=None
+        return self.return_message
+
+#登陆后与服务器进行通信
+class network_message(object):    
+    def __init__(self,master=None):
+        self.service_socket=master
+    
+    def user_name_updata(self):
+        self.service_socket.send(self.message.encode('utf-8'))
+        self.return_message=eval(self.service_socket.recv(1024).decode('utf-8'))
+        return self.return_message
+        
+    def reciver_message(self):
+        while True:
+            self.return_message=eval(self.service_socket.recv(1024).decode('utf-8'))
+        return self.return_message
+
+    def send_message(self):
+        self.return_message=eval(self.service_socket.recv(1024).decode('utf-8'))
+        return self.return_message
+
+#向服务器请求联系人列表
+class require_data_type(object):
+    def __init__(self):
+        self.dict={}
+
+    #请求联系人消息
+    def user_name_updata_type(self):
+        self.dict['Head']='UserNameList'
+        self.dict['type']='POST'
+        return self.dict
+
+    #通信信息信息
+    def message_type(self,Src_name,Dst_name,msg):
+        self.dict['Head']='message'
+        self.dict['type']='POSt'
+        self.dict['Src_name']=Src_name
+        self.dict['Dst_name']=Dst_name
+        self.dict['msg']=msg
+        self.dict['Size']=sys.getsizeof(str(self.dict).encode('utf-8'))
+        return self.dict
+    
+    #登陆消息
+    def login_type(self,username,password):
+        self.dict['Head']='login'
+        self.dict['username']=username    #注册或登陆的用户名
+        self.dict['password']=password    #注册或登陆的密码
+        self.dict['time']=ctime()     #注册或登陆时的时间
+        self.dict['type']='POST'      #消息类型        
+        return self.dict
+
+    #注册消息
+    def registr_type(self,username,password):
+        self.dict['Head']='register'
+        self.dict['username']=username    #注册或登陆的用户名
+        self.dict['password']=password    #注册或登陆的密码
+        self.dict['time']=ctime()     #注册或登陆时的时间
+        self.dict['type']='POST'      #消息类型 
+        return self.dict
 
 if __name__=="__main__":
     root=tk.Tk()
