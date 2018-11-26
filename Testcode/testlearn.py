@@ -150,16 +150,13 @@ dic2 = {
 dic.update(dic2)
 
 for i in range(4):
-    print(dic['user'+str(i)])
-
-print('\n\n')
-length = len(dic)
-
-file.close()
-
-listd = dict.values(dic)
-print(str(dic['user'+ str(0)]['name']))
-
+    print(dic['user'+str(i)]['name'])
+for i in range(len(dic)):
+    dicnew = {
+        'user'+str(i):dic['user'+str(i)]['name']
+    }
+    dic.update(dicnew)
+print(dic)
 '''
 # print(dic['user0'].get('name')) # 字典的键找到值
 

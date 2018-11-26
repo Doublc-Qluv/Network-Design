@@ -4,6 +4,7 @@ import sys,os
 # import random
 import socket, threading
 import json
+import re
 '''
 def store(user, secret, db):
     md5 = hashlib.md5()
@@ -43,17 +44,17 @@ def verify(db):
             print('usererror')
         else:
             flag=1
-            break
-    if flag:
-        if passwd == dict_userold['user'+ str(i)]['password']:    
-            dict_passverify['Flag'] = 1
-            dict_passverify['content'] = 'welcome'
-            #send_back(dict_passverify)
-            print('welcome')
-        else:    
-            dict_passverify['Flag'] = 0
-            dict_passverify['content'] = 'passerror'
-            print('passerror')
+        if flag:
+            if passwd == dict_userold['user'+ str(i)]['password']:    
+                dict_passverify['Flag'] = 1
+                dict_passverify['content'] = 'welcome'
+                #send_back(dict_passverify)
+                print('welcome')
+            else:    
+                dict_passverify['Flag'] = 0
+                dict_passverify['content'] = 'passerror'
+                print('passerror')
+        break
     return dict_passverify
 
 
@@ -128,8 +129,25 @@ def register(db):
             user_file2.write(jsuser_add)
             user_file2.close()
     return dict_register
-def community():
+def community(sockets,useron):
     pass
+    '''
+    注册后更新表需要客户端发一个总表
+    登陆后发送一个在线列表
+    '''
+    clients = {}    #提供 用户名->socket 映射
+    chatwith = {}   #提供通信双方映射
+    while True:
+        datarecv = sockets.recv(1024)
+        if datarecv == 'quit':  #用户退出# 客户端似乎没写
+            del clients[useron]
+            sockets.send(datarecv.encode('utf-8'))
+            sockets.close()
+            print('%s logout' % useron)
+            break
+        elif re.match('to: +', datarecv) is not None: #选择通信对象
+            pass 
+
 def start():
     #创建服务端的socket对象socketserver
     socketserver = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -146,6 +164,7 @@ def start():
     while True:
         clientsocket,addr = socketserver.accept()
         #接收客户端的请求
+        print(clientsocket)
         recvmsg = clientsocket.recv(1024)
         #把接收到的数据进行解码 
         dicData = eval(recvmsg.decode('utf-8'))
