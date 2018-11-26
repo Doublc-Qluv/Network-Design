@@ -114,15 +114,10 @@ class Login_reginster_Page(object):
         self.dict=require_data_type().login_type(self.username.get(),self.password.get())
         if self.dict['username'] and self.dict['password']:
             try:
-<<<<<<< HEAD:untitled1.py
-                self.state=send(self.dict).send_register_login()
-                print(self.state)
-=======
                 #self.state=send(self.dict)    这种也错误，类本身没有返回值
                 #self.state=send(self.dict).send_register_login()                
                 self.state,self.service_socket=send_register_login(self.dict).login_updata()
                 #类的函数两种不同的引用方式
->>>>>>> 36b9c2d023e7c2dd1b1c8db3037ea5a77f6378df:client.py
             except:
                 showwarning(title='登陆失败',message="网络连接不好")
             else:
