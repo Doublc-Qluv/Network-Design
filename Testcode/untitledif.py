@@ -118,7 +118,7 @@ def send(dict):
      
 root=tk.Tk()
 Login_reginster_Page(root)
-#MainPage(root)
+MainPage(root)
 root.mainloop()
         
 

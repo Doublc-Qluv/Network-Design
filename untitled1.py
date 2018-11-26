@@ -109,7 +109,8 @@ class Login_reginster_Page(object):
         self.dict['Head']='login'     #标识消息类型为：登陆验证消息
         if self.dict['username'] and self.dict['password']:
             try:
-                self.state=send(self.dict)
+                self.state=send(self.dict).send_register_login()
+                print(self.state)
             except:
                 showwarning(title='登陆失败',message="网络连接不好")
             else:

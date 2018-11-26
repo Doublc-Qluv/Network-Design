@@ -26,23 +26,19 @@ def verify(db):
     print(db)    
     name = db['username'] 
     passwd = db['password']
-
-    # user_file = open('account.txt','r')  # 打开读取用户文件                           #打开帐号文件 
-    
+    # user_file = open('account.txt','r')  # 打开读取用户文件
     user_file = open('Userform', 'r')
     # temp_file = open('Usernow','w') # 将在线用户写入一个表
     jsuser = user_file.read()
     dict_userold = json.loads(jsuser) # 导入旧表
-
+    dict_passverify = {}
+    dict_passverify['Head'] = 'login'
+    dict_passverify['type'] = 'GET' 
     for i in range(len(dict_userold)):
-        dict_passverify = {}
-        dict_passverify['Head'] = 'login'
-        dict_passverify['type'] = 'GET' 
-        if name not in dict_userold['user'+ str(i)]['name']:
+        if name != dict_userold['user'+ str(i)]['name']:
             dict_passverify['Flag'] = 0
             dict_passverify['content'] = 'usererror'
             #send_back(dict_passverify)
-
             print('usererror')
             break
         else:
@@ -63,25 +59,23 @@ def verify(db):
 
 
 def register(db):
-    global a
     # print(db)    
     name = db['username'] 
     passwd = db['password']
     username = name #input('输入你的用户名\n')
-
-    # user_file = open('account.txt','r')  # 打开读取用户文件                           #打开帐号文件 
-    
+    # user_file = open('account.txt','r')  # 打开读取用户文件
     user_file = open('Userform', 'r')
     # temp_file = open('Usernow','w') # 将在线用户写入一个表
     jsuser = user_file.read()
     dict_userold = json.loads(jsuser) # 导入旧表
     # dict.update(dict2) # 这个函数可以更新字典
     user_file.close()
+    dict_register = {}
+    dict_register['Head'] = 'register'
+    dict_register['type'] = 'GET'
     for i in range(len(dict_userold)):
         if dict_userold['user'+ str(i)]['name'] == username:
-            dict_register = {}
-            dict_register['Head'] = 'register'
-            dict_register['type'] = 'GET'
+
             dict_register['Flag'] = 0
             dict_register['content'] = '用户已存在'
             #send_back(dict_register)
@@ -102,9 +96,10 @@ def register(db):
                 dicta['upper'] += 1
             else:
                 dicta['other'] += 1
-            dict_register = {}
-            dict_register['Head'] = 'register'
-            dict_register['type'] = 'GET'
+
+        dict_register = {}
+        dict_register['Head'] = 'register'
+        dict_register['type'] = 'GET'
 
         if dicta['number'] + dicta['lower'] + dicta['upper'] + dicta['other'] < 4:
             dict_register['Flag'] = 0
@@ -134,7 +129,8 @@ def register(db):
             user_file2.write(jsuser_add)
             user_file2.close()
     return dict_register
-    
+def community():
+    pass
 def start():
     #创建服务端的socket对象socketserver
     socketserver = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -167,6 +163,7 @@ def start():
         elif dicData['Head'] == 'login':
             a=verify(dicData)
             clientsocket.send(str(a).encode('utf-8'))
+            print(a)
             # 开始工作
             # run()
         else:
