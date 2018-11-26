@@ -34,26 +34,26 @@ def verify(db):
     dict_passverify = {}
     dict_passverify['Head'] = 'login'
     dict_passverify['type'] = 'GET' 
+    flag = 0
     for i in range(len(dict_userold)):
-        if name != dict_userold['user'+ str(i)]['name']:
+        if name not in str(dict_userold['user'+ str(i)]['name']):
             dict_passverify['Flag'] = 0
             dict_passverify['content'] = 'usererror'
             #send_back(dict_passverify)
             print('usererror')
-            break
         else:
             flag=1
-        if flag:
-            if passwd == dict_userold['user'+ str(i)]['password']:    
-                dict_passverify['Flag'] = 1
-                dict_passverify['content'] = 'welcome'
-                #send_back(dict_passverify)
-                print('welcome')
-                break
-            else:    
-                dict_passverify['Flag'] = 0
-                dict_passverify['content'] = 'passerror'
-                print('passerror')
+            break
+    if flag:
+        if passwd == dict_userold['user'+ str(i)]['password']:    
+            dict_passverify['Flag'] = 1
+            dict_passverify['content'] = 'welcome'
+            #send_back(dict_passverify)
+            print('welcome')
+        else:    
+            dict_passverify['Flag'] = 0
+            dict_passverify['content'] = 'passerror'
+            print('passerror')
     return dict_passverify
 
 
@@ -74,16 +74,15 @@ def register(db):
     dict_register['Head'] = 'register'
     dict_register['type'] = 'GET'
     for i in range(len(dict_userold)):
-        if dict_userold['user'+ str(i)]['name'] == username:
-
+        if dict_userold['user'+ str(i)]['name'] == username:            
             dict_register['Flag'] = 0
             dict_register['content'] = '用户已存在'
             #send_back(dict_register)
             print('用户名已存在')
             flag=0
-            break
         else:
             flag=1
+            break
     if flag:
         secret = passwd # input('输入你的密码:\n')
         dicta = {'number': 0, 'lower': 0, 'upper': 0, 'other': 0}
