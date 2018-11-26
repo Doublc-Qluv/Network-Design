@@ -35,30 +35,26 @@ def verify(db):
     dict_userold = json.loads(jsuser) # 导入旧表
 
     for i in range(len(dict_userold)):
+        dict_passverify = {}
+        dict_passverify['Head'] = 'login'
+        dict_passverify['type'] = 'GET' 
         if name not in dict_userold['user'+ str(i)]['name']:
-            dict_passverify = {}
-            dict_passverify['Head'] = 'login'
-            dict_passverify['type'] = 'GET'        
             dict_passverify['Flag'] = 0
             dict_passverify['content'] = 'usererror'
             #send_back(dict_passverify)
 
             print('usererror')
             break
-        if name in dict_userold['user'+ str(i)]['name']:
-            if passwd == dict_userold['user'+ str(i)]['password']:
-                dict_passverify = {}
-                dict_passverify['Head'] = 'login'
-                dict_passverify['type'] = 'GET'        
+        else:
+            flag=1
+        if flag:
+            if passwd == dict_userold['user'+ str(i)]['password']:    
                 dict_passverify['Flag'] = 1
                 dict_passverify['content'] = 'welcome'
                 #send_back(dict_passverify)
                 print('welcome')
                 break
-            else:
-                dict_passverify = {}
-                dict_passverify['Head'] = 'login'
-                dict_passverify['type'] = 'GET'        
+            else:    
                 dict_passverify['Flag'] = 0
                 dict_passverify['content'] = 'passerror'
                 print('passerror')
@@ -67,7 +63,8 @@ def verify(db):
 
 
 def register(db):
-    print(db)    
+    global a
+    # print(db)    
     name = db['username'] 
     passwd = db['password']
     username = name #input('输入你的用户名\n')
@@ -82,12 +79,12 @@ def register(db):
     user_file.close()
     for i in range(len(dict_userold)):
         if dict_userold['user'+ str(i)]['name'] == username:
-            dict_existence = {}
-            dict_existence['Head'] = 'register'
-            dict_existence['type'] = 'GET'
-            dict_existence['Flag'] = 0
-            dict_existence['content'] = '用户已存在'
-            #send_back(dict_existence)
+            dict_register = {}
+            dict_register['Head'] = 'register'
+            dict_register['type'] = 'GET'
+            dict_register['Flag'] = 0
+            dict_register['content'] = '用户已存在'
+            #send_back(dict_register)
             print('用户名已存在')
             flag=0
             break
@@ -105,24 +102,24 @@ def register(db):
                 dicta['upper'] += 1
             else:
                 dicta['other'] += 1
-            dict_passverify = {}
-            dict_passverify['Head'] = 'register'
-            dict_passverify['type'] = 'GET'
+            dict_register = {}
+            dict_register['Head'] = 'register'
+            dict_register['type'] = 'GET'
 
         if dicta['number'] + dicta['lower'] + dicta['upper'] + dicta['other'] < 4:
-            dict_passverify['Flag'] = 0
-            dict_passverify['content'] = '密码至少大于四位'
-            #send_back(dict_passverify)
+            dict_register['Flag'] = 0
+            dict_register['content'] = '密码至少大于四位'
+            #send_back(dict_register)
             print('密码至少大于四位')
         elif dicta['lower'] < 1 or dicta['number'] < 1 : # or dicta['upper'] < 1 or dicta['other'] < 1: 
-            dict_passverify['Flag'] = 0
-            dict_passverify['content'] = '密码至少要有一个小写字母以及一个数字'
-            #send_back(dict_passverify)
+            dict_register['Flag'] = 0
+            dict_register['content'] = '密码至少要有一个小写字母以及一个数字'
+            #send_back(dict_register)
             print('密码至少要有一个小写字母以及一个数字')
         else:
-            dict_passverify['Flag'] = 1
-            dict_passverify['content'] = '注册成功'
-            #send_back(dict_passverify)
+            dict_register['Flag'] = 1
+            dict_register['content'] = '注册成功'
+            #send_back(dict_register)
             print('注册成功')
             # 存入表单
             dict_add = {
@@ -136,15 +133,12 @@ def register(db):
             user_file2 = open('Userform', 'w') 
             user_file2.write(jsuser_add)
             user_file2.close()
-    return dict_passverify
+    return dict_register
     
-
-
-if __name__ == '__main__':
+def start():
     #创建服务端的socket对象socketserver
     socketserver = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     host = '127.0.0.1'
-
     port =28956
     #绑定地址（包括ip地址会端口号）
     socketserver.bind((host, port))
@@ -154,7 +148,6 @@ if __name__ == '__main__':
     #注意：accept()函数会返回一个元组
     #元素1为客户端的socket对象，元素2为客户端的地址(ip地址，端口号)
     #clientsocket,addr = socketserver.accept()
-
     while True:
         clientsocket,addr = socketserver.accept()
         #接收客户端的请求
@@ -170,10 +163,17 @@ if __name__ == '__main__':
             a=register(dicData)
             print(a)
             clientsocket.send(str(a).encode('utf-8'))
+            
         elif dicData['Head'] == 'login':
             a=verify(dicData)
             clientsocket.send(str(a).encode('utf-8'))
+            # 开始工作
+            # run()
         else:
             pass
         #clientsocket.send(str(a).encode('utf-8'))
     socketserver.close()
+
+
+if __name__ == '__main__':
+    start()
