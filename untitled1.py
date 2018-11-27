@@ -226,11 +226,11 @@ class user_frame(tk.Frame):   #继承frame类
         self.user_list.configure(yscrollcommand=self.user_bar.set)
         self.user_bar['command']=self.user_list.yview
         #运行线程---联系人在线情况更新
-        #self.update_user_thread=threading.Thread(target=self.require_user_data())
-        #self.update_user_thread.start()
+        self.update_user_thread=threading.Thread(target=self.require_user_data())
+        self.update_user_thread.start()
         #运行线程---接受消息更新  （用户列表信息和消息以及文件）
-        #self.updata_message_thread=threading.Thread(target=self.message_update())
-        #self.updata_message_thread.start()
+        self.updata_message_thread=threading.Thread(target=self.message_update())
+        self.updata_message_thread.start()
     
     #联系人的框更新
     def user_name_list_updata(self):
