@@ -123,8 +123,10 @@ class Login_reginster_Page(object):
                 if self.state['Flag']:
                     self.page1.destroy()
                     self.page2.destroy()
-                    time.sleep(2)
+                    #time.sleep(2)
+                    print("000000")
                     MainPage(self.root,self.service_socket,self.username)
+                    print("0000")
                 else:
                     #登陆失败后，清空消息框，和已经发送消息的内容
                     del self.dict
@@ -173,6 +175,7 @@ class MainPage(object):
         self.root.geometry("%dx%d"%(800,600))
         self.root.title("聊天程序实例")
         self.Main_user_Page()
+        print("000")
     
     #登陆后的界面设计——————菜单
     def Main_user_Page(self):
@@ -210,11 +213,9 @@ class user_frame(tk.Frame):   #继承frame类
         self.message_page=[]
         #与服务器联系的socket
         self.service_socket=service_socket
+        print("0")
         self.Main_active_Page()
-        time.sleep(1)
-        self.updata()
-        #self.after(5000,self.send_user_data)
-        #self.after(5000,self.user_name_updata)        
+               
     
     #联系人框
     def Main_active_Page(self):
@@ -226,16 +227,19 @@ class user_frame(tk.Frame):   #继承frame类
         self.user_bar.pack(side=tk.RIGHT,fill=tk.Y)
         self.user_list.configure(yscrollcommand=self.user_bar.set)
         self.user_bar['command']=self.user_list.yview
+        print("00")
+        self.updata()
 
     #运行更新
     def updata(self):
         #运行线程---联系人在线情况更新
-        self.update_user_thread=threading.Thread(target=self.require_user_data())
+        self.updata_message_thread=threading.Thread(target=self.message_update)
+        self.updata_message_thread.start()
+        self.update_user_thread=threading.Thread(target=self.require_user_data)
         self.update_user_thread.start()
         #运行线程---接受消息更新  （用户列表信息和消息以及文件）
         #time.sleep(2)
-        self.updata_message_thread=threading.Thread(target=self.message_update())
-        self.updata_message_thread.start()
+
     
     #联系人的框更新
     def user_name_list_updata(self):
@@ -254,7 +258,9 @@ class user_frame(tk.Frame):   #继承frame类
     
     #向服务器请求更新用户信息
     def require_user_data(self):
-        self.send=network_send_message(self.service_socket,require_data_type().user_name_updata_type()).user_name_updata()
+        print(require_data_type().user_name_updata_type())
+        network_send_message(self.service_socket,require_data_type().user_name_updata_type()).user_name_updata()
+        print(require_data_type().user_name_updata_type())
         self.after(5000,self.require_user_data)
     
     #点击切换联系人（或用户）
@@ -270,14 +276,13 @@ class user_frame(tk.Frame):   #继承frame类
     
     #向服务器发送更新消息
     def message_update(self):
-        #self.message_page[1].sh
-        #time.sleep(10)
         while True:
             try:
                 self.message=network_reciver_meaasge(self.service_socket).return_message
             except:
                 tk_msg.showinfo(title='网络连接不好',message='请检查你的网络，或服务器是否正常使用')
             else:
+                print(self.message)
                 if self.message['Head']=='message':
                     #更新消息
                     for i in self.whole_user:
@@ -334,15 +339,6 @@ class message_frame(tk.Frame):
         self.file_send_thread.start()
         print(r)
     
-    def reciver(self):
-        while True:
-            self.return_message=eval(self.service_socket.recv(1024).decode('utf-8'))
-            if self.return_message['Head']=='file':
-                pass
-            elif self.return_message['Head']=='message':
-                pass
-            else:
-                pass
             
     #发消息命令
     def send_messsage_command(self):
@@ -396,12 +392,11 @@ class network_send_message(object):
 class network_reciver_meaasge(object):
     def __init__(self,master=None):
         self.service_socket=master
-        self.reciver_message()
+        self.message=self.reciver_message()
         
     def reciver_message(self):
         self.return_message=eval(self.service_socket.recv(1024).decode('utf-8'))
-        self.message=self.return_message
-            #return self.return_message
+        return self.return_message
 
 #向服务器请求的数据类型
 class require_data_type(object):
