@@ -23,8 +23,7 @@ def send_back(dict):
     s.send(str(dict).encode('utf-8'))
 """
 def add_onlist(dic):
-    pass
-    onlist = open('Usernow.txt','r') # 打开在线表
+    onlist = open('Usernow.txt','w+r') # 打开在线表
     jsuseron = onlist.read()
     onlist.close()
     dict_useron = json.loads(jsuseron)# 提取在线表格
@@ -58,9 +57,13 @@ def verify(db):
             dict_passverify['content'] = 'welcome'
             #send_back(dict_passverify)
             print('welcome')
-            #add_onlist(db)
-            break                
-        elif name != dict_userold['user'+ str(len(dict_userold)-1)]['name']:
+            try:
+                add_onlist(db)
+            except:
+                break
+            else:
+                break                
+        elif name != dict_userold['user'+ str(len(dict_userold)-1)]['name'] or passwd != dict_userold['user'+ str(i)]['password']:
             dict_passverify['Flag'] = 0
             dict_passverify['content'] = 'user-or-password-error'
             #send_back(dict_passverify)
