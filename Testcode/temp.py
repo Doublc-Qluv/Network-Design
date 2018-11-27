@@ -57,8 +57,8 @@ while count<3:
         break
     count +=1
 '''
-
-def add_onlist(dic):
+'''
+def add_onlist(dic,hostport):
     username = dic['username'] #input('输入你的用户名\n')
     # user_file = open('account.txt','r')  # 打开读取用户文件
     user_file = open('Usernow', 'r+')
@@ -68,14 +68,49 @@ def add_onlist(dic):
     # dict.update(dict2) # 这个函数可以更新字典
     user_file.close()
     dict_add = {
-        'user'+str(len(dict_userold)): username
+        username:hostport
         }
     dict_userold.update(dict_add)
     jsuser_add = json.dumps(dict_userold)
     user_file2 = open('Usernow', 'r+') 
     user_file2.write(jsuser_add)
+    s = dict_userold.keys()
+    print(list(s))
     user_file2.close()
 
-
-dicta = {'username':'sam'}
-add_onlist(dicta)
+hostport = ('127.0.0.1', 50804)
+dicta = {'username':'qwer'}
+add_onlist(dicta,hostport)
+'''
+def relist_all():
+    # 总表
+    file = open('Userform', 'r') 
+    js = file.read()
+    dic = json.loads(js)
+    dicn = {}
+    for i in range(len(dic)):
+        dicte = {
+            dic['user'+ str(i)]['name']:str(i)
+        }
+        dicn.update(dicte)
+    L1 = list(dicn.keys())
+    # 在线表
+    file = open('Usernow', 'r') 
+    js = file.read()
+    dicnow = json.loads(js)
+    dicn1 = {}
+    for i in range(len(dicnow)):
+        dicte = {
+            dic['user'+ str(i)]['name']:str(i)
+        }
+        dicn1.update(dicte)
+    L1 = list(dicn.keys())
+    L2 = list(dicnow)
+    dict_back = {}
+    dict_back['Head'] = 'UserNameList'
+    dict_back['type'] = 'GET'
+    dict_back['ActiveUserList'] = str(L1)
+    dict_back['WholeUserList'] = str(L2)
+    # return L1,L2
+    return dict_back
+print(relist_all())

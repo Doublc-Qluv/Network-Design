@@ -22,7 +22,7 @@ def send_back(dict):
     s.connect(addr)
     s.send(str(dict).encode('utf-8'))
 """
-def add_onlist(dic):
+def add_onlist(dic,hostport):
     username = dic['username'] #input('输入你的用户名\n')
     # user_file = open('account.txt','r')  # 打开读取用户文件
     user_file = open('Usernow', 'r+')
@@ -41,7 +41,7 @@ def add_onlist(dic):
     user_file2.close()
 def del_onlist(dic):
     pass
-def verify(db):
+def verify(db,hostport):
     print(db)    
     name = db['username'] 
     passwd = db['password']
@@ -62,7 +62,7 @@ def verify(db):
             dict_passverify['content'] = 'welcome'
             #send_back(dict_passverify)
             print('welcome')
-            add_onlist(db)
+            add_onlist(db,hostport)
             break
         else:
             flag -= 1
@@ -150,18 +150,36 @@ def register(db):
             user_file2.close()
     return dict_register
 def relist_all():
-    #pass
+    # 总表
     file = open('Userform', 'r') 
     js = file.read()
     dic = json.loads(js)
+    dicn = {}
     for i in range(len(dic)):
-        dicnew = {
-            'user'+str(i):dic['user'+str(i)]['name']
+        dicte = {
+            dic['user'+ str(i)]['name']:str(i)
         }
-        dic.update(dicnew)
-    print(dic)
-
-    return dic
+        dicn.update(dicte)
+    L1 = list(dicn.keys())
+    # 在线表
+    file = open('Usernow', 'r') 
+    js = file.read()
+    dicnow = json.loads(js)
+    dicn1 = {}
+    for i in range(len(dicnow)):
+        dicte = {
+            dic['user'+ str(i)]['name']:str(i)
+        }
+        dicn1.update(dicte)
+    L1 = list(dicn.keys())
+    L2 = list(dicnow)
+    dict_back = {}
+    dict_back['Head'] = 'UserNameList'
+    dict_back['type'] = 'GET'
+    dict_back['ActiveUserList'] = str(L1)
+    dict_back['WholeUserList'] = str(L2)
+    # return L1,L2
+    return dict_back
 
 def community(sockets,useron):
     pass
@@ -197,7 +215,7 @@ def start():
     #clientsocket,addr = socketserver.accept()
     while True:
         clientsocket,addr = socketserver.accept()
-        #接收客户端的请求
+        #接收客户端的请求s
         print(clientsocket)
         print(addr)
         recvmsg = clientsocket.recv(1024)
@@ -214,13 +232,14 @@ def start():
             clientsocket.send(str(a).encode('utf-8'))
             
         elif dicData['Head'] == 'login':
-            a=verify(dicData)
+            a=verify(dicData,addr)
             clientsocket.send(str(a).encode('utf-8'))
             print(a)
             # 开始工作
             # run()
         elif dicData['Head'] == 'UserNameList':
-            print(relist_all())
+            a = relist_all()
+            clientsocket.send(str(a).encode('utf-8'))
         else:
             pass
         #clientsocket.send(str(a).encode('utf-8'))
