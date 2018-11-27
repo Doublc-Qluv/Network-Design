@@ -22,7 +22,22 @@ def send_back(dict):
     s.connect(addr)
     s.send(str(dict).encode('utf-8'))
 """
-
+def add_onlist(dic):
+    pass
+    onlist = open('Usernow.txt','r') # 打开在线表
+    jsuseron = onlist.read()
+    onlist.close()
+    dict_useron = json.loads(jsuseron)# 提取在线表格
+    dict_addon = {
+        'name': dic['name'],        
+    }
+    dict_useron.update(dict_addon)
+    jsuser_add = json.dumps(dict_useron)
+    user_fileon = open('Userform', 'w') 
+    user_fileon.write(jsuser_add)
+    user_fileon.close()
+def del_onlist(dic):
+    pass
 def verify(db):
     print(db)    
     name = db['username'] 
@@ -36,23 +51,24 @@ def verify(db):
     dict_passverify['Head'] = 'login'
     dict_passverify['type'] = 'GET' 
     print(len(dict_userold))
-    flag = 0
     for i in range(len(dict_userold)):
-        print(dict_userold['user'+ str(i)]['name'])
+        # print(dict_userold['user'+ str(i)]['name'])
         if name == dict_userold['user'+ str(i)]['name'] and passwd == dict_userold['user'+ str(i)]['password']:
             dict_passverify['Flag'] = 1
             dict_passverify['content'] = 'welcome'
             #send_back(dict_passverify)
             print('welcome')
-            # temp_file = open('Usernow','a+') # 将登陆用户写入一个表
-            flag = 1
+            #add_onlist(db)
             break                
-        else:
+        elif name != dict_userold['user'+ str(len(dict_userold)-1)]['name']:
             dict_passverify['Flag'] = 0
             dict_passverify['content'] = 'user-or-password-error'
             #send_back(dict_passverify)
             print('user-or-password-error')
+            break
+        else:
             continue
+
                
     return dict_passverify
 
@@ -129,7 +145,7 @@ def register(db):
             user_file2.close()
     return dict_register
 def relist_all():
-    pass
+    #pass
     file = open('Userform', 'r') 
     js = file.read()
     dic = json.loads(js)
@@ -139,6 +155,10 @@ def relist_all():
         }
         dic.update(dicnew)
     print(dic)
+    user_on = open('Usernow', 'r')
+    # temp_file = open('Usernow','a+') # 将登陆用户写入一个表
+    jsuser = user_on.read()
+    dict_useron = json.loads(jsuser) # 导入旧表
     return dic
 
 def community(sockets,useron):
@@ -177,6 +197,7 @@ def start():
         clientsocket,addr = socketserver.accept()
         #接收客户端的请求
         print(clientsocket)
+        print(addr)
         recvmsg = clientsocket.recv(1024)
         #把接收到的数据进行解码 
         dicData = eval(recvmsg.decode('utf-8'))
