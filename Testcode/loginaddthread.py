@@ -23,18 +23,22 @@ def send_back(dict):
     s.send(str(dict).encode('utf-8'))
 """
 def add_onlist(dic):
-    onlist = open('Usernow.txt','w+r') # 打开在线表
-    jsuseron = onlist.read()
-    onlist.close()
-    dict_useron = json.loads(jsuseron)# 提取在线表格
-    dict_addon = {
-        'name': dic['name'],        
-    }
-    dict_useron.update(dict_addon)
-    jsuser_add = json.dumps(dict_useron)
-    user_fileon = open('Userform', 'w') 
-    user_fileon.write(jsuser_add)
-    user_fileon.close()
+    username = dic['username'] #input('输入你的用户名\n')
+    # user_file = open('account.txt','r')  # 打开读取用户文件
+    user_file = open('Usernow', 'r+')
+    # temp_file = open('Usernow','w') # 将在线用户写入一个表
+    jsuser = user_file.read()
+    dict_userold = json.loads(jsuser) # 导入旧表
+    # dict.update(dict2) # 这个函数可以更新字典
+    user_file.close()
+    dict_add = {
+        'user'+str(len(dict_userold)): username
+        }
+    dict_userold.update(dict_add)
+    jsuser_add = json.dumps(dict_userold)
+    user_file2 = open('Usernow', 'r+') 
+    user_file2.write(jsuser_add)
+    user_file2.close()
 def del_onlist(dic):
     pass
 def verify(db):
@@ -58,6 +62,7 @@ def verify(db):
             dict_passverify['content'] = 'welcome'
             #send_back(dict_passverify)
             print('welcome')
+            add_onlist(db)
             break
         else:
             flag -= 1
@@ -155,10 +160,7 @@ def relist_all():
         }
         dic.update(dicnew)
     print(dic)
-    user_on = open('Usernow', 'r')
-    # temp_file = open('Usernow','a+') # 将登陆用户写入一个表
-    jsuser = user_on.read()
-    dict_useron = json.loads(jsuser) # 导入旧表
+
     return dic
 
 def community(sockets,useron):
