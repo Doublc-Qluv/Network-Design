@@ -177,6 +177,7 @@ def community(sockets,useron):
             break
         elif re.match('to: +', datarecv) is not None: #选择通信对象
             pass
+        
 def run(mysocket,addr):
     recvmsg = mysocket.recv(1024)
     #把接收到的数据进行解码 
