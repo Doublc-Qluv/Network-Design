@@ -247,6 +247,7 @@ class user_frame(tk.Frame):   #继承frame类
             if user not in self.var.get():
                 print('2')
                 print(self.var.get())
+                print(type(self.var.get()))
                 if user in self.active_user:
                     print('1')
                     self.user_list.insert(0,user+"  <active>")
@@ -254,6 +255,10 @@ class user_frame(tk.Frame):   #继承frame类
                 else:
                     self.user_list.insert(tk.END,user+"  <Noactive>")
                     self.message_page.append(message_frame(self,user,self.myself_name))
+            else:
+                if user in self.active:
+                    pass
+                    
     
     
     #向服务器请求更新用户信息
@@ -261,7 +266,7 @@ class user_frame(tk.Frame):   #继承frame类
         print(require_data_type().user_name_updata_type())
         network_send_message(self.service_socket,require_data_type().user_name_updata_type()).user_name_updata()
         print(require_data_type().user_name_updata_type())
-        self.after(5000,self.require_user_data)
+        self.user__list_frame.after(5000,self.require_user_data)
     
     #点击切换联系人（或用户）
     def change_send_message_user(self,event):    #event的作用
