@@ -92,16 +92,19 @@ def register(db):
     dict_register = {}
     dict_register['Head'] = 'register'
     dict_register['type'] = 'GET'
+    flag = 0
     for i in range(len(dict_userold)):
         if dict_userold['user'+ str(i)]['name'] == username:            
             dict_register['Flag'] = 0
             dict_register['content'] = '用户已存在'
             #send_back(dict_register)
             print('用户名已存在')
-            flag=0
-        else:
-            flag=1
             break
+        elif dict_userold['user'+ str(len(dict_userold)-1)]['name'] != username:
+            flag = 1
+            break
+        else:
+            continue
     if flag:
         secret = passwd # input('输入你的密码:\n')
         dicta = {'number': 0, 'lower': 0, 'upper': 0, 'other': 0}
@@ -115,9 +118,6 @@ def register(db):
             else:
                 dicta['other'] += 1
 
-        dict_register = {}
-        dict_register['Head'] = 'register'
-        dict_register['type'] = 'GET'
 
         if dicta['number'] + dicta['lower'] + dicta['upper'] + dicta['other'] < 4:
             dict_register['Flag'] = 0
