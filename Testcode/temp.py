@@ -82,6 +82,7 @@ hostport = ('127.0.0.1', 50804)
 dicta = {'username':'qwer'}
 add_onlist(dicta,hostport)
 '''
+'''
 def relist_all():
     # 总表
     file = open('Userform', 'r') 
@@ -114,3 +115,4 @@ def relist_all():
     # return L1,L2
     return dict_back
 print(relist_all())
+'''

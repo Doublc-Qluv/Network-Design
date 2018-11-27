@@ -6,6 +6,8 @@ import socket, threading
 import json
 import re
 
+clients = {}    #提供 用户名->socket 映射
+chatwith = {}   #提供通信双方映射
 def add_onlist(dic,hostport):
     username = dic['username'] #input('输入你的用户名\n')
     # user_file = open('account.txt','r')  # 打开读取用户文件
@@ -16,7 +18,7 @@ def add_onlist(dic,hostport):
     # dict.update(dict2) # 这个函数可以更新字典
     user_file.close()
     dict_add = {
-        'user'+str(len(dict_userold)): username
+        username:hostport
         }
     dict_userold.update(dict_add)
     jsuser_add = json.dumps(dict_userold)
@@ -143,19 +145,14 @@ def relist_all():
     file = open('Usernow', 'r') 
     js = file.read()
     dicnow = json.loads(js)
-    dicn1 = {}
-    for i in range(len(dicnow)):
-        dicte = {
-            dic['user'+ str(i)]['name']:str(i)
-        }
-        dicn1.update(dicte)
+
     L1 = list(dicn.keys())
-    L2 = list(dicnow)
+    L2 = list(dicnow.keys())
     dict_back = {}
     dict_back['Head'] = 'UserNameList'
     dict_back['type'] = 'GET'
-    dict_back['ActiveUserList'] = str(L1)
-    dict_back['WholeUserList'] = str(L2)
+    dict_back['ActiveUserList'] = str(L2)
+    dict_back['WholeUserList'] = str(L1)
     # return L1,L2
     return dict_back
 
@@ -179,30 +176,25 @@ def community(sockets,useron):
             pass
         
 def run(mysocket,addr):
-    recvmsg = mysocket.recv(1024)
-    #把接收到的数据进行解码 
-    dicData = eval(recvmsg.decode('utf-8'))
-    # receive = input()
-    dicData = dict(dicData)
-    print("收到:",dicData)
-    if dicData['Head'] == 'register':
-        print('yes')
-        a=register(dicData)
-        print(a)
-        mysocket.send(str(a).encode('utf-8'))            
-    elif dicData['Head'] == 'login':
-        a=verify(dicData,addr)
-        mysocket.send(str(a).encode('utf-8'))
-        print(a)
-        # 开始工作
-        # run()
-    elif dicData['Head'] == 'UserNameList':
-        a = relist_all()
-        mysocket.send(str(a).encode('utf-8'))
-        print(a)
-    else:
-        pass
-    #mysocket.send(str(a).encode('utf-8'))
+    while True:
+        recvmsg = mysocket.recv(1024)
+        #把接收到的数据进行解码 
+        dicData = eval(recvmsg.decode('utf-8'))
+        # receive = input()
+        dicData = dict(dicData)
+        print(dicData)
+
+        if dicData['Head'] == 'UserNameList':
+            a = relist_all()
+            mysocket.send(str(a).encode('utf-8'))
+            print(a)
+        elif dicData['Head']=='message':
+            alluser, onlineuser = relist_all()
+            print('hello')
+            print(dicData['msg'])
+        else:
+            continue
+        # mysocket.send(str(a).encode('utf-8'))
 
 def start():
     #创建服务端的socket对象socketserver
@@ -220,15 +212,32 @@ def start():
     while True:
         mysocket,addr = socketserver.accept()
         #接收客户端的请求
-        print(mysocket)
-        print(addr)
-        t = threading.Thread(target=run, args=(mysocket,addr))
-        t.start()
+
+        recvmsg = mysocket.recv(1024)
+        #把接收到的数据进行解码 
+        dicData = eval(recvmsg.decode('utf-8'))
+
+        if dicData['Head'] == 'register':
+            print('yes')
+            a=register(dicData)
+            print(a)
+            mysocket.send(str(a).encode('utf-8'))            
+        elif dicData['Head'] == 'login':
+            a=verify(dicData,addr)
+            mysocket.send(str(a).encode('utf-8'))
+            print(a)
+            if a['Flag'] == 1:
+                clients['username'] = mysocket
+                t = threading.Thread(target=run, args=(mysocket,addr))
+                t.start()
+        else:
+            pass
     socketserver.close()
 
 
 def start_S():
     s = threading.Thread(target=start)#启用一个线程开启服务器
-    s.start()#开启线程    
+    s.start()#开启线程
+    #start()    
 if __name__ == '__main__':
     start_S()
