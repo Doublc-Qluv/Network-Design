@@ -199,6 +199,7 @@ def run(mysocket,addr):
     elif dicData['Head'] == 'UserNameList':
         a = relist_all()
         mysocket.send(str(a).encode('utf-8'))
+        print(a)
     else:
         pass
     #mysocket.send(str(a).encode('utf-8'))
