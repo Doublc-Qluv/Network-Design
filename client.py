@@ -4,7 +4,9 @@ Created on Tue Nov 20 14:19:44 2018
 
 @author: happen
 """
-from tkinter import messagebox as tk_msg
+
+
+from tkinter.messagebox import *
 from tkinter import filedialog
 from tkinter import scrolledtext
 from tkinter import ttk
@@ -91,21 +93,21 @@ class Login_reginster_Page(object):
                 self.state=send_register_login(self.dict).register_updata()
                 print(self.state)
             except:
-                tk_msg.showwarning(title='注册失败',message="网络连接不好")
+                showwarning(title='注册失败',message="网络连接不好")
             else:
                 if self.state['Flag']:
                     self.LoginChange()
                     if self.state['content']:
-                        tk_msg.showinfo(title="注册成功",message=self.state['content'])
+                        showinfo(title="注册成功",message=self.state['content'])
                 else:
                     #注册失败后，清空消息框，和已经发送消息内容
                     del self.dict
                     self.pw.delete(0,tk.END)
                     self.user.delete(0,tk.END)
                     if self.state['content']:
-                        tk_msg.showerror(title="注册失败！",message=self.state['content'])
+                        showerror(title="注册失败！",message=self.state['content'])
         else:
-            tk_msg.showerror(message='你没有输入用户名或密码！')
+            showerror(message='你没有输入用户名或密码！')
     
     #登陆命令
     def loginCheck(self):
@@ -117,27 +119,26 @@ class Login_reginster_Page(object):
                 self.state,self.service_socket=send_register_login(self.dict).login_updata()
                 #类的函数两种不同的引用方式
             except:
-                tk_msg.showwarning(title='登陆失败',message="网络连接不好")
+                showwarning(title='登陆失败',message="网络连接不好")
             else:
                 if self.state['Flag']:
                     self.page1.destroy()
                     self.page2.destroy()
                     time.sleep(1)
-                    MainPage(self.root,self.service_socket)
+                    MainPage(self.root)
                 else:
                     #登陆失败后，清空消息框，和已经发送消息的内容
                     del self.dict
                     self.pw.delete(0,tk.END)
                     self.user.delete(0,tk.END)
                     if self.state['content']:
-                        tk_msg.showerror(title="登陆失败！",message=self.state['content'])
+                        showerror(title="登陆失败！",message=self.state['content'])
         else:
-            tk_msg.showerror(title='登陆失败',message='你没有输入用户名或密码！')
+            showerror(title='登陆失败',message='你没有输入用户名或密码！')
 
 #登陆后的界面
 class MainPage(object):
-    def __init__(self,master=None,service_socket=None):
-        self.service_socket=service_socket
+    def __init__(self,master=None):
         self.root=master
         self.root.geometry("%dx%d"%(800,600))
         self.root.title("聊天程序实例")
@@ -319,8 +320,8 @@ class network_message(object):
     def __init__(self,master=None):
         self.service_socket=master
     
-    def user_name_updata(self,message=None):
-        self.service_socket.send(message.encode('utf-8'))
+    def user_name_updata(self):
+        self.service_socket.send(self.message.encode('utf-8'))
         self.return_message=eval(self.service_socket.recv(1024).decode('utf-8'))
         return self.return_message
         
@@ -329,8 +330,8 @@ class network_message(object):
             self.return_message=eval(self.service_socket.recv(1024).decode('utf-8'))
         return self.return_message
 
-    def send_message(self,message):
-        self.service_socket.send(message.encode('utf-8'))
+    def send_message(self):
+        self.return_message=eval(self.service_socket.recv(1024).decode('utf-8'))
         return self.return_message
 
 #向服务器请求联系人列表

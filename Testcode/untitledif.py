@@ -99,7 +99,7 @@ class Login_reginster_Page(object):
                 if state:
                     self.page1.destroy()
                     self.page2.destroy()
-                    MainPage(self.root)
+                    # MainPage(self.root)
                 else:
                     del self.dict
                     showerror(title="登陆失败！",message="你的用户名或密码错误！")
@@ -118,7 +118,7 @@ def send(dict):
      
 root=tk.Tk()
 Login_reginster_Page(root)
-MainPage(root)
+# MainPage(root)
 root.mainloop()
         
 
