@@ -50,6 +50,7 @@ def verify(db):
     dict_passverify['Head'] = 'login'
     dict_passverify['type'] = 'GET' 
     print(len(dict_userold))
+    flag = len(dict_userold)
     for i in range(len(dict_userold)):
         # print(dict_userold['user'+ str(i)]['name'])
         if name == dict_userold['user'+ str(i)]['name'] and passwd == dict_userold['user'+ str(i)]['password']:
@@ -57,20 +58,16 @@ def verify(db):
             dict_passverify['content'] = 'welcome'
             #send_back(dict_passverify)
             print('welcome')
-            try:
-                add_onlist(db)
-            except:
-                break
-            else:
-                break                
-        elif name != dict_userold['user'+ str(len(dict_userold)-1)]['name'] or passwd != dict_userold['user'+ str(i)]['password']:
+            break
+        else:
+            flag -= 1
+            continue
+    if flag == 0:
             dict_passverify['Flag'] = 0
             dict_passverify['content'] = 'user-or-password-error'
             #send_back(dict_passverify)
             print('user-or-password-error')
-            break
-        else:
-            continue
+            
 
                
     return dict_passverify
