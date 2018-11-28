@@ -188,7 +188,7 @@ def community(sockets):
         sockets.send(recvData.encode('utf-8'))
         sockets.close()
         print('%s logout' % recvData['Src_name'])
-    elif recvData['Src_name'] is not None: #选择通信对象
+    elif recvData['Src_name'] != 'root': #选择通信对象
         sendto = {
             'Head':'message',
             'type':'GET',
@@ -224,6 +224,7 @@ def run(mysocket,addr):
             print('hello')
             print(dicData['msg'])
         elif dicData['Head']=='quit':
+            mysocket.close()
             break
         else:
             print('error')
