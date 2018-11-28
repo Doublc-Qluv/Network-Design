@@ -25,6 +25,23 @@ def add_onlist(dic,hostport):
     user_file2 = open('Usernow', 'r+') 
     user_file2.write(jsuser_add)
     user_file2.close()
+def del_onlist():
+    username = dic['username'] #input('输入你的用户名\n')
+    # user_file = open('account.txt','r')  # 打开读取用户文件
+    user_file = open('Usernow', 'r+')
+    # temp_file = open('Usernow','w') # 将在线用户写入一个表
+    jsuser = user_file.read()
+    dict_userold = json.loads(jsuser) # 导入旧表
+    # dict.update(dict2) # 这个函数可以更新字典
+    user_file.close()
+    dict_add = {
+        username:hostport
+        }
+    dict_userold.update(dict_add)
+    jsuser_add = json.dumps(dict_userold)
+    user_file2 = open('Usernow', 'r+') 
+    user_file2.write(jsuser_add)
+    user_file2.close()
 def onlinedict():
     pass
     file = open('Usernow', 'r') 
@@ -166,7 +183,7 @@ def register(db):
     return dict_register
 
 
-def community(sockets,useron):
+def community(sockets,useron,dicData):
     pass
     '''
     注册后更新表需要客户端发一个总表
@@ -174,16 +191,16 @@ def community(sockets,useron):
     '''
     clients = {}    #提供 用户名->socket 映射
     chatwith = {}   #提供通信双方映射
-    while True:
-        datarecv = sockets.recv(1024)
-        if datarecv == 'quit':  #用户退出# 客户端似乎没写
-            del clients[useron]
-            sockets.send(datarecv.encode('utf-8'))
-            sockets.close()
-            print('%s logout' % useron)
-            break
-        elif re.match('to: +', datarecv) is not None: #选择通信对象
-            pass
+
+    datarecv = sockets.recv(1024)
+    if datarecv == 'quit':  #用户退出# 客户端似乎没写
+        del clients[useron]
+        sockets.send(datarecv.encode('utf-8'))
+        sockets.close()
+        print('%s logout' % useron)
+        break
+    elif re.match('to: +', datarecv) is not None: #选择通信对象
+        pass
         
 def run(mysocket,addr):
     while True:
@@ -202,8 +219,10 @@ def run(mysocket,addr):
 
             print('hello')
             print(dicData['msg'])
+        elif dicData['Head']=='quit':
+            break
         else:
-            continue
+            print('error')
         # mysocket.send(str(a).encode('utf-8'))
 
 def start():
