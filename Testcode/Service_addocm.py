@@ -181,34 +181,6 @@ def register(db):
     return dict_register
 
 
-def community(sockets):    
-    recvData = sockets.recv(1024)
-    recvData = eval(recvData.decode('utf-8'))
-    print(recvData)
-    print('isis')
-    '''
-    if recvData['Head'] == 'quit':  #用户退出
-        del_onlist(recvData['Src_name'])
-        sockets.send(recvData.encode('utf-8'))
-        sockets.close()
-        print('%s logout' % recvData['Src_name'])
-    elif recvData['Src_name'] != 'root': #选择通信对象
-
-        
-    '''
-    sendto = {
-        'Head':'message',
-        'type':'GET',
-        'Src_name':recvData['Src_name'],
-        'Dst_name':recvData['Dst_name'],
-        'Size':recvData['Size'],
-        'msg':recvData['msg']            
-    }
-    clients[recvData['Src_name']].send(str(sendto).decode("utf-8") )
-
-
-
-        
 def run(mysocket,addr):
     ''' 
     recvData = mysocket.recv(1024)
