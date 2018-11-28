@@ -321,6 +321,9 @@ class user_frame(tk.Frame):   #继承frame类
                 if j!=i:
                     self.message_page[j].pack_forget()
     
+    def page_update(self):
+        self.message_page[i].show_message_frame.after(500,self.page_update)
+    
     #向服务器发送更新消息
     def message_update(self):
         while True:
@@ -343,6 +346,7 @@ class user_frame(tk.Frame):   #继承frame类
                     for i in range(len(self.message_page)):
                         if self.message_page[i]==self.message['Dst_name']:
                             self.message_page[i].message_list.insert(tk.END,ctime())
+                            self.message_page[i].show_message_frame.after(500,self.page_update)
                             break
                     #for i in self.whole_user:
                         #if i==self.message['Src_name']:
