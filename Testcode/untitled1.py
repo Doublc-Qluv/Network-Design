@@ -124,9 +124,7 @@ class Login_reginster_Page(object):
                     self.page1.destroy()
                     self.page2.destroy()
                     #time.sleep(2)
-                    print("000000")
                     MainPage(self.root,self.service_socket,self.username)
-                    print("0000")
                 else:
                     #登陆失败后，清空消息框，和已经发送消息的内容
                     del self.dict
@@ -175,7 +173,6 @@ class MainPage(object):
         self.root.geometry("%dx%d"%(800,600))
         self.root.title("聊天程序实例")
         self.Main_user_Page()
-        print("000")
     
     #登陆后的界面设计——————菜单
     def Main_user_Page(self):
@@ -211,9 +208,10 @@ class user_frame(tk.Frame):   #继承frame类
         self.user__list_frame.pack(side=tk.LEFT,fill='y',expand=1)
         self.var=tk.StringVar()
         self.message_page=[]
+        self.active_user=[]
+        self.whole_user=[]
         #与服务器联系的socket
         self.service_socket=service_socket
-        print("0")
         self.Main_active_Page()
                
     
@@ -227,7 +225,6 @@ class user_frame(tk.Frame):   #继承frame类
         self.user_bar.pack(side=tk.RIGHT,fill=tk.Y)
         self.user_list.configure(yscrollcommand=self.user_bar.set)
         self.user_bar['command']=self.user_list.yview
-        print("00")
         self.updata()
 
     #运行更新
@@ -235,44 +232,69 @@ class user_frame(tk.Frame):   #继承frame类
         #运行线程---联系人在线情况更新
         self.updata_message_thread=threading.Thread(target=self.message_update)
         self.updata_message_thread.start()
+        time.sleep(1)
         self.update_user_thread=threading.Thread(target=self.require_user_data)
         self.update_user_thread.start()
-        #运行线程---接受消息更新  （用户列表信息和消息以及文件）
-        #time.sleep(2)
 
-    
+
+         
     #联系人的框更新
     def user_name_list_updata(self):
-        for user in self.whole_user:
-            if user not in self.var.get():
-                print('2')
-                print(self.var.get())
-                print(type(self.var.get()))
-                if user in self.active_user:
-                    print('1')
+        print('0',self.active_add,self.active_delete)
+        print('1',self.whole_add,self.whole_delete)
+        for user in self.whole_add:
+            #新的用户注册
+            #print('11',user)
+            self.user_list.insert(tk.END,user+"  <Noactive>")
+            self.message_page.append(message_frame(self,user,self.myself_name))
+        for user in self.whole_delete:
+            #当用户从注销该账号
+            for i in range(len(eval(self.var.get()))):
+                if eval(self.var.get())[i].split(' ')[0]==user:
+                    self.user_list.delete(i)
+                    del self.message_page[i]
+                    break
+        for user in self.active_add:
+            #用户又非在线状态变为在线状态
+            #print(self.var.get())
+            #print('size:',len(self.var.get()))
+            #print('type:',type(eval(self.var.get())))
+            for i in range(len(eval(self.var.get()))):
+                #print(i)
+                #print(self.var.get())
+                #print(self.var.get()[i])
+                #print(self.var.get()[i].split(' ')[0])
+                if eval(self.var.get())[i].split(' ')[0]==user:
+                    #print('00',self.var.get()[i])
+                    self.user_list.delete(i)
+                    del self.message_page[i]
                     self.user_list.insert(0,user+"  <active>")
                     self.message_page.insert(0,message_frame(self,user,self.myself_name))
-                else:
+                    break
+        for user in self.active_delete:
+            #用户有在线状态变为非在线状态
+            for i in range(len(eval(self.var.get()))):
+                if eval(self.var.get())[i].split(' ')[0]==user:
+                    self.user_list.delete(i)
+                    del self.message_page[i]
                     self.user_list.insert(tk.END,user+"  <Noactive>")
                     self.message_page.append(message_frame(self,user,self.myself_name))
-            else:
-                if user in self.active:
-                    pass
-                    
-    
-    
+                    break
+
+                        
+                
     #向服务器请求更新用户信息
     def require_user_data(self):
-        print(require_data_type().user_name_updata_type())
+        #print(require_data_type().user_name_updata_type())
         network_send_message(self.service_socket,require_data_type().user_name_updata_type()).user_name_updata()
-        print(require_data_type().user_name_updata_type())
+        #print(require_data_type().user_name_updata_type())
         self.user__list_frame.after(5000,self.require_user_data)
     
     #点击切换联系人（或用户）
     def change_send_message_user(self,event):    #event的作用
         for i in self.user_list.curselection():
             print("1")
-            print(self.user_list.get(i))
+            #print(self.user_list.get(i))
             #page=message_frame(self,self.user_list.get(i).split()[0])
             self.message_page[i].pack(side=tk.RIGHT)
             for j in range(len(self.whole_user)):
@@ -287,7 +309,7 @@ class user_frame(tk.Frame):   #继承frame类
             except:
                 tk_msg.showinfo(title='网络连接不好',message='请检查你的网络，或服务器是否正常使用')
             else:
-                print(self.message)
+                #print(self.message)
                 if self.message['Head']=='message':
                     #更新消息
                     for i in self.whole_user:
@@ -295,14 +317,15 @@ class user_frame(tk.Frame):   #继承frame类
                             self.message_page[i].message_list.insert(tk.END,ctime())
                 elif self.message['Head']=='UserNameList':
                     #更新联系人
+                    self.active_add,self.active_delete=set(eval(self.message['ActiveUserList']))-set(self.active_user),set(self.active_user)-set(eval(self.message['ActiveUserList']))
                     self.active_user=eval(self.message['ActiveUserList'])  
-                    print(self.active_user)
+                    #print(self.active_user)
+                    self.whole_add,self.whole_delete=set(eval(self.message['WholeUserList']))-set(self.whole_user),set(self.whole_user)-set(eval(self.message['WholeUserList']))
                     self.whole_user=eval(self.message['WholeUserList'])
                     self.user_name_list_updata()
                 elif self.message['Head']=='file':
                     pass
         #self.message_page[i].show_message_frame.after(500,self.message_update)
-
 
 
 
