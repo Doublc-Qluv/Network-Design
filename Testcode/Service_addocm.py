@@ -5,6 +5,7 @@ import sys,os
 import socket, threading
 import json
 import re
+import socketserver
 
 clients = {}    #提供 用户名->socket 映射
 chatwith = {}   #提供通信双方映射
@@ -204,7 +205,7 @@ def community(sockets):
         'msg':recvData['msg']            
     }
     clients[recvData['Src_name']].send(str(sendto).decode("utf-8") )
-    
+
 
 
         
@@ -229,7 +230,6 @@ def run(mysocket,addr):
             print(a)
         elif dicData['Head']=='message':
             #community(mysocket)
-                       
             recvData = eval(recvmsg.decode('utf-8'))
             sendto = {
                 'Head':'message',
@@ -241,18 +241,22 @@ def run(mysocket,addr):
             }
             print(sendto)
             clients[recvData['Src_name']].send(str(sendto).encode("utf-8") )
-            print(dicData['msg'])
+            print(recvData['Src_name'])
+            print(clients[recvData['Src_name']])
+        elif dicData['Head']=='file':
+            pass
         elif dicData['Head']=='quit':
             del_onlist(dicData['Src_name'])
             mysocket.send(str(dicData).encode('utf-8'))
             mysocket.close()
             print('%s logout' % dicData['Src_name'])
             break
-        elif socket.setdefaulttimeout(20):
+        elif recvmsg <= 0:
             del_onlist(dicData['Src_name'])
             mysocket.send(str(dicData).encode('utf-8'))
             mysocket.close()
-            print('%s logout' % dicData['Src_name'])            
+            print('%s logout' % dicData['Src_name'])
+            break            
         else:
             print('error')
         # mysocket.send(str(a).encode('utf-8'))
@@ -273,7 +277,6 @@ def start():
     while True:# 总父线程
         mysocket,addr = socketserver.accept()
         #接收客户端的请求
-
         recvmsg = mysocket.recv(1024)
         #把接收到的数据进行解码 
         dicData = eval(recvmsg.decode('utf-8'))
@@ -292,8 +295,6 @@ def start():
                 clients[username] = mysocket
                 t = threading.Thread(target=run, args=(mysocket,addr))
                 t.start()
-        elif expression:
-            pass
         else:
             pass
     socketserver.close()

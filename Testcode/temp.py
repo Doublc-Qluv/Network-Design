@@ -128,6 +128,5 @@ def onlinedict():
 print(onlinedict())
 ''' 
 
-timeout = 20    
-if socket.setdefaulttimeout(timeout) == 10:
-    pass
+s = "['root', 'sam', 'asdf']"
+s = eval(s)
