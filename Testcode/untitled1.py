@@ -340,9 +340,13 @@ class user_frame(tk.Frame):   #继承frame类
                 #print(self.message)
                 if self.message['Head']=='message':
                     #更新消息
-                    for i in self.whole_user:
-                        if i==self.message['Src_name']:
+                    for i range(len(self.message_page)):
+                        if self.message_page[i]==self.message['Dst_name']:
                             self.message_page[i].message_list.insert(tk.END,ctime())
+                            break
+                    #for i in self.whole_user:
+                        #if i==self.message['Src_name']:
+                            #self.message_page[i].message_list.insert(tk.END,ctime())
                 elif self.message['Head']=='UserNameList':
                     #更新联系人
                     self.active_add,self.active_delete=set(eval(self.message['ActiveUserList']))-set(self.active_user),set(self.active_user)-set(eval(self.message['ActiveUserList']))
