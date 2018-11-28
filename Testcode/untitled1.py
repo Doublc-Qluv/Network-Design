@@ -322,7 +322,8 @@ class user_frame(tk.Frame):   #继承frame类
                     self.message_page[j].pack_forget()
     
     def page_update(self):
-        self.message_page[i].show_message_frame.after(500,self.page_update)
+        for i in range(len(self.whole_user)):
+                self.message_page[i].show_message_frame.after(500,self.page_update)
     
     #向服务器发送更新消息
     def message_update(self):
