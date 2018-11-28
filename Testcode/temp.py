@@ -116,3 +116,11 @@ def relist_all():
     return dict_back
 print(relist_all())
 '''
+def onlinedict():
+    pass
+    file = open('Usernow', 'r') 
+    js = file.read()
+    dicnow = json.loads(js)
+    file.close()
+    return dicnow
+print(onlinedict())
