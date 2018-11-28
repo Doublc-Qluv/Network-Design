@@ -240,7 +240,7 @@ def run(mysocket,addr):
                 'msg':recvData['msg']            
             }
             print(sendto)
-            clients[recvData['Src_name']].send(str(sendto).encode("utf-8") )
+            clients[recvData['Dst_name']].send(str(sendto).encode("utf-8") )
             print(recvData['Src_name'])
             print(clients[recvData['Src_name']])
         elif dicData['Head']=='file':
