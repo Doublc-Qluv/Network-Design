@@ -124,7 +124,7 @@ class Login_reginster_Page(object):
                     self.page1.destroy()
                     self.page2.destroy()
                     #time.sleep(2)
-                    MainPage(self.root,self.service_socket,self.username)
+                    MainPage(self.root,self.service_socket,self.username.get())
                 else:
                     #登陆失败后，清空消息框，和已经发送消息的内容
                     del self.dict
@@ -230,11 +230,13 @@ class user_frame(tk.Frame):   #继承frame类
     #运行更新
     def updata(self):
         #运行线程---联系人在线情况更新
-        self.updata_message_thread=threading.Thread(target=self.message_update)
-        self.updata_message_thread.start()
         time.sleep(1)
+        #time.sleep(1)
         self.update_user_thread=threading.Thread(target=self.require_user_data)
         self.update_user_thread.start()
+        time.sleep(1)
+        self.updata_message_thread=threading.Thread(target=self.message_update)
+        self.updata_message_thread.start()
         #self.require_user_data()
 
 
@@ -307,10 +309,11 @@ class user_frame(tk.Frame):   #继承frame类
         while True:
             try:
                 self.message=network_reciver_meaasge(self.service_socket).message
+                print(self.message)
             except:
                 tk_msg.showinfo(title='网络连接不好',message='请检查你的网络，或服务器是否正常使用')
-                self.update_user_thread.stop()
-                self.updata_message_thread.stop()
+                #self.update_user_thread.join()
+                #self.updata_message_thread.join()
             else:
                 #print(self.message)
                 if self.message['Head']=='message':
@@ -334,7 +337,7 @@ class user_frame(tk.Frame):   #继承frame类
 
 #消息框与文本框界面设计
 class message_frame(tk.Frame):
-    def __init__(self,master=None,name=None,service_socket=None,myself=None,height=100):
+    def __init__(self,master=None,name=None,service_socket=None,myself=None):
         tk.Frame.__init__(self)
         self.frame=master
         self.user_name=name
@@ -363,12 +366,13 @@ class message_frame(tk.Frame):
     def openfile(self):
         #显示打开文件对话框，返回文件名以及路径
         self.filename=filedialog.askopenfilename(title='选择发送的文件',filetypes=[('Python','*.py *.pyw'),('All Files','*')])
-        self.size=os.path.getsize(r)
+        self.size=os.path.getsize(self.filename)
         self.message=require_data_type().file_message_type(self.filename,self.size,self.myself_name,self.user_name)
-        p=network_send_message(self.service_socket,self.message).send_file_message()
+        print(self.message)
+        p=network_send_message(self.service_socket,self.message)
         self.file_send_thread=threading.Thread(target=p.send_file_message)
         self.file_send_thread.start()
-        print(r)
+        #print(self.filename)
     
             
     #发消息命令
@@ -476,7 +480,7 @@ class require_data_type(object):
         self.dict['type']='POST'      #消息类型 
         return self.dict
     
-    def file_message_type(self,file,size,Src_name_Dstname):
+    def file_message_type(self,file,size,Src_name,Dst_name):
         self.dict['Head']='file'
         self.dict['type']='POST'
         self.dict['Src_name']=Src_name
