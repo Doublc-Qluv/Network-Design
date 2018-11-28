@@ -164,6 +164,7 @@ class send_register_login(object):
         self.service_socket=None
         return self.return_message
 
+
 #登陆后的界面
 class MainPage(object):
     def __init__(self,master=None,service_socket=None,myself=None):
@@ -181,7 +182,7 @@ class MainPage(object):
         #self.AboutMe_Page=about_frame(self.root)
         #self.active_user_Page.place(x=0,y=0)
         self.user_page=user_frame(self.root,self.service_socket,self.myself_name)
-        self.AboutMe_Page=About_me(self.root)
+        self.AboutMe_Page=About_me(self.root,self.service_socket,self.myself_name)
         self.user_page.place(x=0,y=0)
         menubar=tk.Menu(self.root)
         menubar.add_command(label='User',command=self.user_data)
@@ -190,13 +191,19 @@ class MainPage(object):
     
     #联系人界面    
     def user_data(self):
+        #self.AboutMe_Page.destroy()
+        #self.user_page=user_frame(self.root,self.service_socket,self.myself_name)
         self.user_page.place(x=0,y=0)
         self.AboutMe_Page.place_forget()   
         
     #关于该软件 
     def about_data(self):
-        self.user_page.place_forget()
+        #self.user_page.destroy()
+        #self.AboutMe_Page=About_me(self.root,self.service_socket)
+        
+        #BEDUG
         self.AboutMe_Page.place(x=0,y=0)
+        self.user_page.place_forget()
 
 #联系人界面----消息界面 
 class user_frame(tk.Frame):   #继承frame类
@@ -233,10 +240,14 @@ class user_frame(tk.Frame):   #继承frame类
         time.sleep(1)
         #time.sleep(1)
         self.update_user_thread=threading.Thread(target=self.require_user_data)
+        self.update_user_thread.setDaemon(False)
         self.update_user_thread.start()
+        
         time.sleep(1)
         self.updata_message_thread=threading.Thread(target=self.message_update)
+        self.updata_message_thread.setDaemon(False)
         self.updata_message_thread.start()
+        
         #self.require_user_data()
 
 
@@ -299,7 +310,8 @@ class user_frame(tk.Frame):   #继承frame类
             print("1")
             #print(self.user_list.get(i))
             #page=message_frame(self,self.user_list.get(i).split()[0])
-            self.message_page[i].pack(side=tk.RIGHT)
+            self.message_page[i].pack()
+            #self.message_page[i].pack(side=tk.RIGHT)
             for j in range(len(self.whole_user)):
                 if j!=i:
                     self.message_page[j].pack_forget()
@@ -311,7 +323,12 @@ class user_frame(tk.Frame):   #继承frame类
                 self.message=network_reciver_meaasge(self.service_socket).message
                 print(self.message)
             except:
+                if True:
+                    break
                 tk_msg.showinfo(title='网络连接不好',message='请检查你的网络，或服务器是否正常使用')
+                self.user__list_frame.destroy()
+                self.root.destroy()
+                sys.exit(0)
                 #self.update_user_thread.join()
                 #self.updata_message_thread.join()
             else:
@@ -338,8 +355,8 @@ class user_frame(tk.Frame):   #继承frame类
 #消息框与文本框界面设计
 class message_frame(tk.Frame):
     def __init__(self,master=None,name=None,service_socket=None,myself=None):
-        tk.Frame.__init__(self)
-        self.frame=master
+        #tk.Frame.__init__(self)
+        self.frame=tk.Frame(master)
         self.user_name=name
         self.service_socket=service_socket
         self.myself_name=myself
@@ -347,7 +364,7 @@ class message_frame(tk.Frame):
     
     #消息框与文本框界面    
     def Main_message_page(self):
-        self.show_message_frame=tk.LabelFrame(self,text=self.user_name,width=200,height=600)
+        self.show_message_frame=tk.LabelFrame(self.frame,text=self.user_name,width=200,height=600)
         self.message_bar=tk.Scrollbar(self.show_message_frame)
         self.message_bar.pack(side=tk.RIGHT,fill=tk.Y,expand=1)
         self.message_list=tk.Listbox(self.show_message_frame,width=47,height=17,selectmode=tk.BROWSE,font=('Fixdsys',15))
@@ -355,11 +372,11 @@ class message_frame(tk.Frame):
         self.message_list.pack(anchor=tk.W,fill=tk.Y,expand=1)
         self.message_bar['command']=self.message_list.yview()
         self.show_message_frame.pack(anchor=tk.W,side=tk.TOP)       #顺序
-        self.button_send=tk.Button(self,text='send',fg='blue',command=self.send_messsage_command)
+        self.button_send=tk.Button(self.frame,text='send',fg='blue',command=self.send_messsage_command)
         self.button_send.pack(side=tk.BOTTOM,anchor=tk.E)
-        self.text=scrolledtext.ScrolledText(self,width=68,height=11,wrap=tk.WORD)
+        self.text=scrolledtext.ScrolledText(self.frame,width=68,height=11,wrap=tk.WORD)
         self.text.pack(side=tk.BOTTOM)
-        self.file_button=tk.Button(self,text='file',fg='blue',height=1,width=4,command=self.openfile)   #dia
+        self.file_button=tk.Button(self.frame,text='file',fg='blue',height=1,width=4,command=self.openfile)   #dia
         self.file_button.pack(side=tk.BOTTOM,anchor=tk.W)
     
     #发文件命令
@@ -393,19 +410,35 @@ class message_frame(tk.Frame):
             self.message_list.insert(tk.END,"%s"%ctime().rjust(35))
             self.message_list.insert(tk.END,self.user_name+":"+self.message)
             self.text.delete(0.0,tk.END)
-####当发送与其他如联系人更新时冲突是，会发生什么     不会冲突，因为发送和接受是不同的线程     
+####当发送与其他如联系人更新时冲突是，会发生什么     不会冲突，因为发送和接受是不同的线程  
+            
+            
+            
+"""
+def savefile():
+    #显示保存文件对话框
+    r=asksaveasfilename(title='',initialdir='/home/happen/Desktop',initialfile='hello.py')
+    print(r)
+"""
         
 class About_me(tk.Frame):
-    def __init__(self,master=None):
-        tk.Frame.__init__(self,master)
+    def __init__(self,master=None,service=None,myself=None):
+        tk.Frame.__init__(self)
+        self.root=master
+        self.service_socket=service
         self.Main_AboutMe_page()
+        self.myself=myself
         
     def Main_AboutMe_page(self):
         tk.Label(self,text='正在更新！'.rjust(30),font=('Fixdsys',20),fg='red').pack(side=tk.TOP,anchor=tk.N)
         tk.Button(self,text='qiut',command=self.page_close).pack()
         
     def page_close(self):
-        #sys.exit()
+        network_send_message(self.service_socket,require_data_type().quit_message(self.myself)).send_qiut_message()
+        self.service_socket.close()
+        self.root.destroy()
+        #print(require_data_type().quit_message())
+        sys.exit(0)
         pass
 
 
@@ -429,6 +462,9 @@ class network_send_message(object):
 
     
     def send_file_message(self):
+        self.service_socket.send(str(self.message).encode('utf-8'))
+        
+    def send_qiut_message(self):
         self.service_socket.send(str(self.message).encode('utf-8'))
 
 #登陆后服务器接受消息
@@ -488,6 +524,11 @@ class require_data_type(object):
         self.dict['file']=file
         self.dict['size']=size
         return self.dict
+    
+    def quit_message(self,Src_name):
+        self.dict['Head']='quit'
+        self.dict['type']='POST'
+        self.dict['Src_name']=Src_name
 
 
 """
@@ -553,10 +594,9 @@ class file_send(object):
  """       
 filepath='' 
 class file_revicer(object):
-    def __init__(self,filename=None):
+    def __init__(self,filename=None,service=None):
         self.filename=filename
-        
-        self.service_socket=service_socket
+        self.service_socket=service
         #得到文件名和文件路径
         #self.filepath=os.path.dirname(self.file)
         #self.filename=os.path.basename(self.file)
