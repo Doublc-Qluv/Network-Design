@@ -238,6 +238,7 @@ def run(mysocket,addr):
                 'Size':recvData['Size'],
                 'msg':recvData['msg']            
             }
+            print(sendto)
             clients[recvData['Src_name']].send(str(sendto).encode("utf-8") )
             print(dicData['msg'])
         elif dicData['Head']=='quit':
@@ -246,6 +247,11 @@ def run(mysocket,addr):
             mysocket.close()
             print('%s logout' % dicData['Src_name'])
             break
+        elif socket.setdefaulttimeout(20):
+            del_onlist(dicData['Src_name'])
+            mysocket.send(str(dicData).encode('utf-8'))
+            mysocket.close()
+            print('%s logout' % dicData['Src_name'])            
         else:
             print('error')
         # mysocket.send(str(a).encode('utf-8'))
