@@ -285,6 +285,8 @@ def start():
                 clients[username] = mysocket
                 t = threading.Thread(target=run, args=(mysocket,addr))
                 t.start()
+        elif expression:
+            pass
         else:
             pass
     socketserver.close()

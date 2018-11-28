@@ -5,6 +5,7 @@ import sys,os
 import socket, threading
 import json
 import re
+import time
 
 # 新线程执行的代码:
 '''
@@ -116,6 +117,7 @@ def relist_all():
     return dict_back
 print(relist_all())
 '''
+'''
 def onlinedict():
     pass
     file = open('Usernow', 'r') 
@@ -124,3 +126,8 @@ def onlinedict():
     file.close()
     return dicnow
 print(onlinedict())
+''' 
+
+timeout = 20    
+if socket.setdefaulttimeout(timeout) == 20:
+    print('True')
