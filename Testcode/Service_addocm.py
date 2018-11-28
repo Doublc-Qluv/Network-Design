@@ -208,9 +208,11 @@ def community(sockets):
 
         
 def run(mysocket,addr):
+    ''' 
     recvData = mysocket.recv(1024)
     clients[recvData] = mysocket
     print(clients[recvData])
+    '''
 
     while True:
         recvmsg = mysocket.recv(1024)
@@ -226,8 +228,7 @@ def run(mysocket,addr):
             print(a)
         elif dicData['Head']=='message':
             #community(mysocket)
-            
-            
+                       
             recvData = eval(recvmsg.decode('utf-8'))
             sendto = {
                 'Head':'message',
@@ -237,7 +238,7 @@ def run(mysocket,addr):
                 'Size':recvData['Size'],
                 'msg':recvData['msg']            
             }
-            clients[recvData['Src_name']].send(str(sendto).decode("utf-8") )
+            clients[recvData['Src_name']].send(str(sendto).encode("utf-8") )
             print(dicData['msg'])
         elif dicData['Head']=='quit':
             del_onlist(dicData['Src_name'])
@@ -262,7 +263,7 @@ def start():
     #注意：accept()函数会返回一个元组
     #元素1为客户端的socket对象，元素2为客户端的地址(ip地址，端口号)
     #mysocket,addr = socketserver.accept()
-    while True:
+    while True:# 总父线程
         mysocket,addr = socketserver.accept()
         #接收客户端的请求
 
@@ -280,8 +281,9 @@ def start():
             mysocket.send(str(a).encode('utf-8'))
             print(a)
             if a['Flag'] == 1:
+                username = dicData['username']
+                clients[username] = mysocket
                 t = threading.Thread(target=run, args=(mysocket,addr))
-                clients['username'] = mysocket
                 t.start()
         else:
             pass
