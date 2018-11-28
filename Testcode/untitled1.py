@@ -310,8 +310,7 @@ class user_frame(tk.Frame):   #继承frame类
             print("1")
             #print(self.user_list.get(i))
             #page=message_frame(self,self.user_list.get(i).split()[0])
-            self.message_page[i].pack()
-            #self.message_page[i].pack(side=tk.RIGHT)
+            self.message_page[i].pack(side=tk.RIGHT)
             for j in range(len(self.whole_user)):
                 if j!=i:
                     self.message_page[j].pack_forget()
@@ -355,8 +354,8 @@ class user_frame(tk.Frame):   #继承frame类
 #消息框与文本框界面设计
 class message_frame(tk.Frame):
     def __init__(self,master=None,name=None,service_socket=None,myself=None):
-        #tk.Frame.__init__(self)
-        self.frame=tk.Frame(master)
+        tk.Frame.__init__(self)
+        self.frame=master
         self.user_name=name
         self.service_socket=service_socket
         self.myself_name=myself
@@ -364,7 +363,7 @@ class message_frame(tk.Frame):
     
     #消息框与文本框界面    
     def Main_message_page(self):
-        self.show_message_frame=tk.LabelFrame(self.frame,text=self.user_name,width=200,height=600)
+        self.show_message_frame=tk.LabelFrame(self,text=self.user_name,width=200,height=600)
         self.message_bar=tk.Scrollbar(self.show_message_frame)
         self.message_bar.pack(side=tk.RIGHT,fill=tk.Y,expand=1)
         self.message_list=tk.Listbox(self.show_message_frame,width=47,height=17,selectmode=tk.BROWSE,font=('Fixdsys',15))
@@ -372,11 +371,11 @@ class message_frame(tk.Frame):
         self.message_list.pack(anchor=tk.W,fill=tk.Y,expand=1)
         self.message_bar['command']=self.message_list.yview()
         self.show_message_frame.pack(anchor=tk.W,side=tk.TOP)       #顺序
-        self.button_send=tk.Button(self.frame,text='send',fg='blue',command=self.send_messsage_command)
+        self.button_send=tk.Button(self,text='send',fg='blue',command=self.send_messsage_command)
         self.button_send.pack(side=tk.BOTTOM,anchor=tk.E)
-        self.text=scrolledtext.ScrolledText(self.frame,width=68,height=11,wrap=tk.WORD)
+        self.text=scrolledtext.ScrolledText(self,width=68,height=11,wrap=tk.WORD)
         self.text.pack(side=tk.BOTTOM)
-        self.file_button=tk.Button(self.frame,text='file',fg='blue',height=1,width=4,command=self.openfile)   #dia
+        self.file_button=tk.Button(self,text='file',fg='blue',height=1,width=4,command=self.openfile)   #dia
         self.file_button.pack(side=tk.BOTTOM,anchor=tk.W)
     
     #发文件命令
