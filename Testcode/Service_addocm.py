@@ -26,18 +26,15 @@ def add_onlist(dic,hostport):
     user_file2.write(jsuser_add)
     user_file2.close()
 def del_onlist(username):
-    pass
     # user_file = open('account.txt','r')  # 打开读取用户文件
     user_file = open('Usernow', 'r+')
+    user_file.close()
     # temp_file = open('Usernow','w') # 将在线用户写入一个表
     jsuser = user_file.read()
     dict_userold = json.loads(jsuser) # 导入旧表
     # dict.update(dict2) # 这个函数可以更新字典
-    user_file.close()
-    dict_add = {
-        username:hostport
-        }
-    dict_userold.update(dict_add)
+    dict_userold = dict_userold.pop(username)
+    dict_userold.update(dict_userold)
     jsuser_add = json.dumps(dict_userold)
     user_file2 = open('Usernow', 'r+') 
     user_file2.write(jsuser_add)
@@ -183,25 +180,33 @@ def register(db):
     return dict_register
 
 
-def community(sockets,useron,dicData):
-    pass
-    '''
-    注册后更新表需要客户端发一个总表
-    登陆后发送一个在线列表
-    '''
-    clients = {}    #提供 用户名->socket 映射
-    chatwith = {}   #提供通信双方映射
-    recvData = dicData
-    # recvData = sockets.recv(1024)
-    if recvData == 'quit':  #用户退出# 客户端似乎没写
-        del clients[useron]
+def community(sockets):    
+    recvData = sockets.recv(1024)
+    recvData = eval(recvData.decode('utf-8'))
+    if recvData['Head'] == 'quit':  #用户退出
+        del_onlist(recvData['Src_name'])
         sockets.send(recvData.encode('utf-8'))
         sockets.close()
-        print('%s logout' % useron)
-    elif re.match('to: +', recvData) is not None: #选择通信对象
+        print('%s logout' % recvData['Src_name'])
+    elif recvData['Src_name'] is not None: #选择通信对象
+        sendto = {
+            'Head':'message',
+            'type':'GET',
+            'Src_name':recvData['Src_name'],
+            'Dst_name':recvData['Dst_name'],
+            'Size':recvData['Size'],
+            'msg':recvData['msg']            
+        }
+        clients[recvData['Src_name']].send(str(sendto).decode("utf-8") )
+    else:
         pass
+
         
 def run(mysocket,addr):
+    recvData = mysocket.recv(1024)
+    clients[recvData] = mysocket
+    print(clients[recvData])
+
     while True:
         recvmsg = mysocket.recv(1024)
         #把接收到的数据进行解码 
@@ -215,7 +220,7 @@ def run(mysocket,addr):
             mysocket.send(str(a).encode('utf-8'))
             print(a)
         elif dicData['Head']=='message':
-            # community(mysocket, )
+            community(mysocket)
             print('hello')
             print(dicData['msg'])
         elif dicData['Head']=='quit':
