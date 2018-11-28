@@ -340,7 +340,7 @@ class user_frame(tk.Frame):   #继承frame类
                 #print(self.message)
                 if self.message['Head']=='message':
                     #更新消息
-                    for i range(len(self.message_page)):
+                    for i in range(len(self.message_page)):
                         if self.message_page[i]==self.message['Dst_name']:
                             self.message_page[i].message_list.insert(tk.END,ctime())
                             break
