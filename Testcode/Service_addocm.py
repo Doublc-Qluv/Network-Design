@@ -25,8 +25,8 @@ def add_onlist(dic,hostport):
     user_file2 = open('Usernow', 'r+') 
     user_file2.write(jsuser_add)
     user_file2.close()
-def del_onlist():
-    username = dic['username'] #input('输入你的用户名\n')
+def del_onlist(username):
+    pass
     # user_file = open('account.txt','r')  # 打开读取用户文件
     user_file = open('Usernow', 'r+')
     # temp_file = open('Usernow','w') # 将在线用户写入一个表
@@ -191,15 +191,14 @@ def community(sockets,useron,dicData):
     '''
     clients = {}    #提供 用户名->socket 映射
     chatwith = {}   #提供通信双方映射
-
-    datarecv = sockets.recv(1024)
-    if datarecv == 'quit':  #用户退出# 客户端似乎没写
+    recvData = dicData
+    # recvData = sockets.recv(1024)
+    if recvData == 'quit':  #用户退出# 客户端似乎没写
         del clients[useron]
-        sockets.send(datarecv.encode('utf-8'))
+        sockets.send(recvData.encode('utf-8'))
         sockets.close()
         print('%s logout' % useron)
-        break
-    elif re.match('to: +', datarecv) is not None: #选择通信对象
+    elif re.match('to: +', recvData) is not None: #选择通信对象
         pass
         
 def run(mysocket,addr):
@@ -216,7 +215,7 @@ def run(mysocket,addr):
             mysocket.send(str(a).encode('utf-8'))
             print(a)
         elif dicData['Head']=='message':
-
+            # community(mysocket, )
             print('hello')
             print(dicData['msg'])
         elif dicData['Head']=='quit':
@@ -256,8 +255,8 @@ def start():
             mysocket.send(str(a).encode('utf-8'))
             print(a)
             if a['Flag'] == 1:
-                clients['username'] = mysocket
                 t = threading.Thread(target=run, args=(mysocket,addr))
+                clients['username'] = mysocket
                 t.start()
         else:
             pass
