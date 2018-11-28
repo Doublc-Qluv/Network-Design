@@ -183,6 +183,8 @@ def register(db):
 def community(sockets):    
     recvData = sockets.recv(1024)
     recvData = eval(recvData.decode('utf-8'))
+    print(recvData)
+    print('isis')
     '''
     if recvData['Head'] == 'quit':  #用户退出
         del_onlist(recvData['Src_name'])
@@ -223,8 +225,19 @@ def run(mysocket,addr):
             mysocket.send(str(a).encode('utf-8'))
             print(a)
         elif dicData['Head']=='message':
-            community(mysocket)
-            print('hello')
+            #community(mysocket)
+            
+            
+            recvData = eval(recvmsg.decode('utf-8'))
+            sendto = {
+                'Head':'message',
+                'type':'GET',
+                'Src_name':recvData['Src_name'],
+                'Dst_name':recvData['Dst_name'],
+                'Size':recvData['Size'],
+                'msg':recvData['msg']            
+            }
+            clients[recvData['Src_name']].send(str(sendto).decode("utf-8") )
             print(dicData['msg'])
         elif dicData['Head']=='quit':
             del_onlist(dicData['Src_name'])
