@@ -407,7 +407,7 @@ class message_frame(tk.Frame):
             tk_msg.showerror(title='发送失败',message='发送失败')
         else:
             self.message_list.insert(tk.END,"%s"%ctime().rjust(35))
-            self.message_list.insert(tk.END,self.user_name+":"+self.message)
+            self.message_list.insert(tk.END,self.myself_name+":"+self.message)
             self.text.delete(0.0,tk.END)
 ####当发送与其他如联系人更新时冲突是，会发生什么     不会冲突，因为发送和接受是不同的线程  
             
