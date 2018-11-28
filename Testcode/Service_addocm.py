@@ -217,6 +217,25 @@ def run(mysocket,addr):
             print(clients[recvData['Src_name']])
         elif dicData['Head']=='file':
             pass
+            '''
+        def file_message_type(self,file,size,Src_name,Dst_name):
+        self.dict['Head']='file'
+        self.dict['type']='POST'
+        self.dict['Src_name']=Src_name
+        self.dict['Dst_name']=Dst_name
+        self.dict['file']=file
+        self.dict['size']=size
+        return self.dict
+
+        needback        
+"""
+        self.dict['Head']='file'
+        self.dict['type']='POST'
+        self.dict['Flag']=1/0/2
+        self.dict['file']=file
+        self.dict['offset']=offset
+"""
+            '''
         elif dicData['Head']=='quit':
             del_onlist(dicData['Src_name'])
             mysocket.send(str(dicData).encode('utf-8'))
