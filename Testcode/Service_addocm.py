@@ -204,6 +204,7 @@ def community(sockets):
         'msg':recvData['msg']            
     }
     clients[recvData['Src_name']].send(str(sendto).decode("utf-8") )
+    
 
 
         
