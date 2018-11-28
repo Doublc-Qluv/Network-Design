@@ -201,7 +201,7 @@ class MainPage(object):
 #联系人界面----消息界面 
 class user_frame(tk.Frame):   #继承frame类
     def __init__(self,master=None,service_socket=None,myself=None):
-        tk.Frame.__init__(self,master,width=800,height=600)
+        tk.Frame.__init__(self,width=800,height=600)
         self.root=master
         self.myself_name=myself
         self.user__list_frame=tk.Frame(self)
@@ -235,6 +235,7 @@ class user_frame(tk.Frame):   #继承frame类
         time.sleep(1)
         self.update_user_thread=threading.Thread(target=self.require_user_data)
         self.update_user_thread.start()
+        #self.require_user_data()
 
 
          
@@ -246,7 +247,7 @@ class user_frame(tk.Frame):   #继承frame类
             #新的用户注册
             #print('11',user)
             self.user_list.insert(tk.END,user+"  <Noactive>")
-            self.message_page.append(message_frame(self,user,self.myself_name))
+            self.message_page.append(message_frame(self,user,self.service_socket,self.myself_name))
         for user in self.whole_delete:
             #当用户从注销该账号
             for i in range(len(eval(self.var.get()))):
@@ -269,7 +270,7 @@ class user_frame(tk.Frame):   #继承frame类
                     self.user_list.delete(i)
                     del self.message_page[i]
                     self.user_list.insert(0,user+"  <active>")
-                    self.message_page.insert(0,message_frame(self,user,self.myself_name))
+                    self.message_page.insert(0,message_frame(self,user,self.service_socket,self.myself_name))
                     break
         for user in self.active_delete:
             #用户有在线状态变为非在线状态
@@ -278,7 +279,7 @@ class user_frame(tk.Frame):   #继承frame类
                     self.user_list.delete(i)
                     del self.message_page[i]
                     self.user_list.insert(tk.END,user+"  <Noactive>")
-                    self.message_page.append(message_frame(self,user,self.myself_name))
+                    self.message_page.append(message_frame(self,user,self.service_socket,self.myself_name))
                     break
 
                         
@@ -305,9 +306,11 @@ class user_frame(tk.Frame):   #继承frame类
     def message_update(self):
         while True:
             try:
-                self.message=network_reciver_meaasge(self.service_socket).return_message
+                self.message=network_reciver_meaasge(self.service_socket).message
             except:
                 tk_msg.showinfo(title='网络连接不好',message='请检查你的网络，或服务器是否正常使用')
+                self.update_user_thread.stop()
+                self.updata_message_thread.stop()
             else:
                 #print(self.message)
                 if self.message['Head']=='message':
@@ -332,7 +335,7 @@ class user_frame(tk.Frame):   #继承frame类
 #消息框与文本框界面设计
 class message_frame(tk.Frame):
     def __init__(self,master=None,name=None,service_socket=None,myself=None,height=100):
-        tk.Frame.__init__(self,master)
+        tk.Frame.__init__(self)
         self.frame=master
         self.user_name=name
         self.service_socket=service_socket
@@ -371,9 +374,15 @@ class message_frame(tk.Frame):
     #发消息命令
     def send_messsage_command(self):
         self.message=self.text.get(0.0,tk.END)
-        self.dict=require_data_type().message_type(self.user_name,self.myself_name,self.message)
+        self.dict=require_data_type().message_type(self.myself_name,self.user_name,self.message)
         try:
+            #print(self.service_socket,self.dict)
+            #print(str(self.dict).encode('utf-8'))
+            #self.service_socket.send(str(self.dict).encode('utf-8'))
+            #self.send=network_send_message(self.service_socket,self.dict)
+            #self.send_thread=threading.Thread(target=self.send.send_message())
             network_send_message(self.service_socket,self.dict).send_message()
+            print(self.service_socket,self.dict)
         except:
             tk_msg.showerror(title='发送失败',message='发送失败')
         else:
@@ -403,6 +412,7 @@ class network_send_message(object):
     def __init__(self,master=None,message=None):
         self.service_socket=master
         self.message=message
+        print('1')
     
     def user_name_updata(self):
         self.service_socket.send(str(self.message).encode('utf-8'))
@@ -410,6 +420,7 @@ class network_send_message(object):
         #return self.return_message
 
     def send_message(self):
+        print('2')
         self.service_socket.send(str(self.message).encode('utf-8'))
 
     
