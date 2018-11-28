@@ -182,7 +182,9 @@ class MainPage(object):
         #self.AboutMe_Page=about_frame(self.root)
         #self.active_user_Page.place(x=0,y=0)
         self.user_page=user_frame(self.root,self.service_socket,self.myself_name)
+        self.message_page=self.user_page.message_page
         self.AboutMe_Page=About_me(self.root,self.service_socket,self.myself_name)
+        #self.message_page=message_frame(self.root,'root',self.service_socket,self.myself_name)
         self.user_page.place(x=0,y=0)
         menubar=tk.Menu(self.root)
         menubar.add_command(label='User',command=self.user_data)
@@ -204,6 +206,10 @@ class MainPage(object):
         #BEDUG
         self.AboutMe_Page.place(x=0,y=0)
         self.user_page.place_forget()
+        #self.message_page.place_forget()
+        for i in self.message_page:
+            i.pack_forget()
+        
 
 #联系人界面----消息界面 
 class user_frame(tk.Frame):   #继承frame类
