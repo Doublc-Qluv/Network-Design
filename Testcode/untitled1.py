@@ -307,7 +307,7 @@ class user_frame(tk.Frame):   #继承frame类
     #点击切换联系人（或用户）
     def change_send_message_user(self,event):    #event的作用
         for i in self.user_list.curselection():
-            print("1")
+            print("02")
             #print(self.user_list.get(i))
             #page=message_frame(self,self.user_list.get(i).split()[0])
             self.message_page[i].pack(side=tk.RIGHT)
@@ -490,7 +490,7 @@ class require_data_type(object):
     #通信信息信息
     def message_type(self,Src_name,Dst_name,msg):
         self.dict['Head']='message'
-        self.dict['type']='POSt'
+        self.dict['type']='POST'
         self.dict['Src_name']=Src_name
         self.dict['Dst_name']=Dst_name
         self.dict['msg']=msg
