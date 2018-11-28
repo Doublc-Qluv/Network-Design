@@ -183,23 +183,26 @@ def register(db):
 def community(sockets):    
     recvData = sockets.recv(1024)
     recvData = eval(recvData.decode('utf-8'))
+    '''
     if recvData['Head'] == 'quit':  #用户退出
         del_onlist(recvData['Src_name'])
         sockets.send(recvData.encode('utf-8'))
         sockets.close()
         print('%s logout' % recvData['Src_name'])
     elif recvData['Src_name'] != 'root': #选择通信对象
-        sendto = {
-            'Head':'message',
-            'type':'GET',
-            'Src_name':recvData['Src_name'],
-            'Dst_name':recvData['Dst_name'],
-            'Size':recvData['Size'],
-            'msg':recvData['msg']            
-        }
-        clients[recvData['Src_name']].send(str(sendto).decode("utf-8") )
-    else:
-        pass
+
+        
+    '''
+    sendto = {
+        'Head':'message',
+        'type':'GET',
+        'Src_name':recvData['Src_name'],
+        'Dst_name':recvData['Dst_name'],
+        'Size':recvData['Size'],
+        'msg':recvData['msg']            
+    }
+    clients[recvData['Src_name']].send(str(sendto).decode("utf-8") )
+
 
         
 def run(mysocket,addr):
@@ -224,7 +227,10 @@ def run(mysocket,addr):
             print('hello')
             print(dicData['msg'])
         elif dicData['Head']=='quit':
+            del_onlist(dicData['Src_name'])
+            mysocket.send(str(dicData).encode('utf-8'))
             mysocket.close()
+            print('%s logout' % dicData['Src_name'])
             break
         else:
             print('error')
