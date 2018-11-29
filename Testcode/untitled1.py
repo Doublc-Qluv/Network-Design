@@ -368,7 +368,7 @@ class user_frame(tk.Frame):   #继承frame类
                                 self.message_page[i].message_list.insert(tk.END,self.message['Src_name']+':'+'发送文件完成!')
                             elif self.message['Flag']==2 or self.message['Flag']==0:
                                 self.message_page[i].message_list.insert(tk.END,ctime().rjust(35))
-                                self.message_page[i].message_list.insert(tk.END,self.message['Src_name']+':'+'文件已有%s'%self.message['offset'])
+                                self.message_page[i].message_list.insert(tk.END,self.message['Src_name']+':'+'文件已有%skb'%self.message['offset'])
                                 self.file_message_thread=threading.Thread(target=file_send,args=(self.message['filename'],self.service_socket,self.message['offset'],self.message['Dst_name'],self.message['Src_name']))
                                 self.file_message_thread.start()
                             break
