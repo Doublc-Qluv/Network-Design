@@ -191,7 +191,8 @@ def ftpserv(Data):
     #dict_fileback['Flag']=1/0/2
     #dict_fileback['filename']=file
     #dict_fileback['offset']=offset
-    dict_fileback['file']=Data['filename']
+    dict_fileback['file'] = Data['filename']
+    dict_fileback['Src_name'] = Data['Src_name']
     file_path = "D:/Network-Design/Testcode/"
     filename = '/'.join((file_path, os.path.basename(Data['filename'])))
     log = "%s.%s" % (filename.split('.')[0],'log')#指定记录偏移日志文件名
