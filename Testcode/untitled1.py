@@ -613,14 +613,16 @@ class file_send(object):
             read_lenght=0
             while True:
                 send_data=fd.read(512)
+                print("aa")
                 #当当前文件已读的长度等于偏移量
                 if send_data and read_lenght==int(self.offset):
+                    print('1222')
                     send_message=require_data_type().file_message_type(self.file,os.path.getsize(self.file),self.Src_name,self.Dst_name,send_data)
                     network_send_message(self.service_socket,send_message).send_file_message()
                     print(send_message)
                     break
                 else:
-                    read_lenght=+len(send_data)
+                    read_lenght=read_lenght+len(send_data)
 """
     def reciver_message(self):
         while True:
