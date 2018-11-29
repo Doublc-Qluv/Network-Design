@@ -230,7 +230,7 @@ def ftpserv(sk,Data):
             f.write(str(total_len))
     clients[Data['Src_name']].send(str(dict_fileback).encode("utf-8") )
     # 转发到目的地址
-    #clients[Data['Src_name']].send(str(dict_fileback).encode("utf-8") )
+    # clients[Data['Src_name']].send(str(dict_fileback).encode("utf-8") )
 
 
 '''
