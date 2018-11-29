@@ -221,6 +221,8 @@ def ftpserv(sk):
             
         if flag == 1:
             os.remove(logname)# 文件完整或者完成删除log
+            tosend = 1
+            break
         elif flag == 2:
             recv_data = Data['content']
             total_len += len(recv_data)
@@ -233,6 +235,20 @@ def ftpserv(sk):
         # 转发到目的地址
         
         # clients[Data['Src_name']].send(str(dict_fileback).encode("utf-8") )
+    if tosend:
+        with open(filename,'rb') as fd:
+            read_lenght=0
+            while True:
+                send_data=fd.read(512)
+                #当当前文件已读的长度等于偏移量
+                if send_data and read_lenght==int(offset):
+                    send_message=require_data_type().file_message_type(file,os.path.getsize(file),Src_name,Dst_name,send_data)
+                    network_send_message(service_socket,send_message)
+                    print(send_message)
+                    read_lenght=+len(send_data)
+                    break
+                else:
+                    continue
 
 
 '''
@@ -278,7 +294,7 @@ def run(mysocket,addr):
                 'msg':recvData['msg']            
             }
             print(sendto)
-            if not clients[recvData['Dst_name']]:
+            if recvData['Dst_name'] in clients.keys():   
                 clients[recvData['Dst_name']].send(str(sendto).encode("utf-8") )
         elif dicData['Head']=='file':
             #ftpserv(mysocket,dicData)
