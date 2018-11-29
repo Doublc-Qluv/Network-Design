@@ -374,7 +374,7 @@ class user_frame(tk.Frame):   #继承frame类
                                 self.message_page[i].message_list.insert(tk.END,self.message['Src_name']+':'+'文件已有%skb'%self.message['offset'])
                                 self.file_message_thread=threading.Thread(target=file_send,args=(self.message['filename'],self.service_socket,self.message['offset'],self.message['Dst_name'],self.message['Src_name']))
                                 self.file_message_thread.start()
-                            break
+                                break
 
         #self.message_page[i].show_message_frame.after(500,self.message_update)
 """
@@ -606,6 +606,7 @@ class file_send(object):
         self.Src_name=Src_name
         self.Dst_name=Dst_name
         self.send()
+        print('21')
     
     #发送文件
     def send(self):
