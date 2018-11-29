@@ -428,8 +428,10 @@ class message_frame(tk.Frame):
         self.button_send.pack(side=tk.BOTTOM,anchor=tk.E)
         self.text=scrolledtext.ScrolledText(self,width=68,height=11,wrap=tk.WORD)
         self.text.pack(side=tk.BOTTOM)
-        self.file_button=tk.Button(self,text='send_file',fg='blue',height=1,width=4,command=self.openfile)   #dia
-        self.file_button.pack(side=tk.BOTTOM,anchor=tk.W)
+        self.file_button=tk.Button(self,text='send_file',fg='blue',height=1,width=8,command=self.openfile)   #dia
+        self.file_button.pack(side=tk.LEFT)
+        self.file_button=tk.Button(self,text='r_file',fg='blue',height=1,width=4,command=self.re_file)   #dia
+        self.file_button.pack(side=tk.RIGHT)
     
     #发文件命令
     def openfile(self):
@@ -460,6 +462,10 @@ class message_frame(tk.Frame):
             self.message_list.insert(tk.END,"%s"%ctime().rjust(35))
             self.message_list.insert(tk.END,self.myself_name+":"+self.message)
             self.text.delete(0.0,tk.END)
+
+    def re_file(self):
+        fd=filedialog.asksaveasfilename(title='接受文件',initialdir='E:/',initialfile='hello.py')
+        print(fd)
 ####当发送与其他如联系人更新时冲突是，会发生什么     不会冲突，因为发送和接受是不同的线程  
             
             
