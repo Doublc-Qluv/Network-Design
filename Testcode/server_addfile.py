@@ -227,8 +227,9 @@ def ftpserv(sk,Data):
         with open(logname,'w') as f:   #把已接收到的数据长度写入日志
             f.write(str(total_len))
     
-    clients[Data['Src_name']].send(str(dict_fileback).encode("utf-8") )
+    clients[Data['Src_name']].send(str(dict_fileback).encode("utf-8"))
     # 转发到目的地址
+    
     # clients[Data['Src_name']].send(str(dict_fileback).encode("utf-8") )
 
 
