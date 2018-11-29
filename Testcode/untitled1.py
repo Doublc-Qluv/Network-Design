@@ -437,6 +437,7 @@ class message_frame(tk.Frame):
         self.filename=filedialog.askopenfilename(title='选择发送的文件',filetypes=[('Python','*.py *.pyw'),('txt','*.txt')])
         self.file_message_thread=threading.Thread(target=file_send,args=(self.filename,self.service_socket,0,self.user_name,self.myself_name))
         self.file_message_thread.start()
+        #file_send(self.filename,self.service_socket,0,self.user_name,self.myself_name)
         print("file")
         #print(self.filename)
     
@@ -601,13 +602,15 @@ class file_send(object):
             read_lenght=0
             while True:
                 send_data=fd.read(512)
-                if send_data and read_lenght>int(self.offset):
+                #当当前文件已读的长度等于偏移量
+                if send_data and read_lenght==int(self.offset):
                     send_message=require_data_type().file_message_type(self.file,os.path.getsize(self.file),self.Src_name,self.Dst_name,send_data)
                     network_send_message(self.service_socket,send_message)
                     print(send_message)
                     read_lenght=+len(send_data)
                     break
-                
+                else:
+                    continue
 """
     def reciver_message(self):
         while True:
