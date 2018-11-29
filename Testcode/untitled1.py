@@ -437,7 +437,6 @@ class message_frame(tk.Frame):
         self.filename=filedialog.askopenfilename(title='选择发送的文件',filetypes=[('Python','*.py *.pyw')])
         self.size=os.path.getsize(self.filename)
         file_send(self.filename,self.service_socket,0,self.user_name,self.myself_name)
-        self.file_send_thread.start()
         #print(self.filename)
     
             
@@ -601,7 +600,7 @@ class file_send(object):
                 send_data=fd.read(512)
                 if send_data and read_lenght>int(self.offset):
                     try:
-                        send_message=require_data_type().file_message_type(os.path.getsize(self.file),self.Src_name,self.Dst_name,send_data)
+                        send_message=require_data_type().file_message_type(self.file,os.path.getsize(self.file),self.Src_name,self.Dst_name,send_data)
                         network_send_message(self.service_socket,self.message)
                         
                     except:
