@@ -618,10 +618,9 @@ class file_send(object):
                     send_message=require_data_type().file_message_type(self.file,os.path.getsize(self.file),self.Src_name,self.Dst_name,send_data)
                     network_send_message(self.service_socket,send_message).send_file_message()
                     print(send_message)
-                    read_lenght=+len(send_data)
                     break
                 else:
-                    continue
+                    read_lenght=+len(send_data)
 """
     def reciver_message(self):
         while True:
