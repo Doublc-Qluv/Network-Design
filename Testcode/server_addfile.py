@@ -191,15 +191,17 @@ def ftpserv(Data):
     #dict_fileback['Flag']=1/0/2
     #dict_fileback['filename']=file
     #dict_fileback['offset']=offset
-    dict_fileback['file'] = Data['filename']
+    dict_fileback['filename'] = Data['filename']
     dict_fileback['Src_name'] = Data['Src_name']
-    file_path = "D:/Network-Design/Testcode/"
+    dict_fileback['Dst_name'] = Data['Dst_name']
+    file_path = "D:/Network-Design/Testcode"
     filename = '/'.join((file_path, os.path.basename(Data['filename'])))
     log = "%s.%s" % (filename.split('.')[0],'log')#指定记录偏移日志文件名
     #logname = os.path.join(file_path,log)   #定义日志路径
     print('a')
+    offset=0
     if os.path.exists(filename):
-        if os.path.getsize(filename) == eval(Data['filesize']):
+        if os.path.getsize(filename) == Data['filesize']:
             #sk.send('已完整存在')   
             dict_fileback['Flag'] = 1
             flag =1
@@ -207,16 +209,16 @@ def ftpserv(Data):
         elif os.path.exists(filename) and os.path.exists(log):#需要断点续传
             with open(log) as f:
                 offset = f.read().strip()   #读取偏移量
+                print(offset)
                 # 发送offset
             dict_fileback['offset'] = offset
             dict_fileback['Flag'] = 2
             flag = 2
-        else:
-            pass
     else:
         offset = 0
         dict_fileback['offset'] = offset
         #sk.send()    
+        
         dict_fileback['Flag'] = 0
         flag = 0 # 0 需要完整发送
     total_len = int(offset) # 计算偏移量大小 即从这个位置传输或者接收
@@ -225,14 +227,15 @@ def ftpserv(Data):
         os.remove(log)# 文件完整或者完成删除log
         tosend = 1
         
-    elif flag == 2:
+    elif flag == 2 or flag == 0:
         recv_data = Data['content']
         total_len += len(recv_data)
+        dict_fileback['offset'] = total_len
         with open(filename,'ab') as fd:    #以追加的方式写入文件
             fd.write(recv_data)
-        with open(logname,'w') as f:   #把已接收到的数据长度写入日志
+        with open(log,'w') as f:   #把已接收到的数据长度写入日志
             f.write(str(total_len))
-    
+    print(dict_fileback)
     clients[Data['Src_name']].send(str(dict_fileback).encode("utf-8"))
     # 转发到目的地址
     
