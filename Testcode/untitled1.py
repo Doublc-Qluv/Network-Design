@@ -435,8 +435,9 @@ class message_frame(tk.Frame):
     def openfile(self):
         #显示打开文件对话框，返回文件名以及路径
         self.filename=filedialog.askopenfilename(title='选择发送的文件',filetypes=[('Python','*.py *.pyw'),('txt','*.txt')])
-        self.size=os.path.getsize(self.filename)
-        file_send(self.filename,self.service_socket,0,self.user_name,self.myself_name)
+        self.file_message_thread=threading.Thread(target=file_send,args=(self.filename,self.service_socket,0,self.user_name,self.myself_name))
+        self.file_message_thread.start()
+        print("file")
         #print(self.filename)
     
             
@@ -582,6 +583,8 @@ class require_data_type(object):
         self.dict['type']='POST'
         self.dict['Src_name']=Src_name
 
+
+        
 #文件发送
 class file_send(object):
     def __init__(self,file=None,service_socket=None,offset=None,Dst_name=None,Src_name=None):
@@ -594,23 +597,16 @@ class file_send(object):
     
     #发送文件
     def send(self):
-        with open(self.file) as fd:
+        with open(self.file,'rb') as fd:
             read_lenght=0
             while True:
                 send_data=fd.read(512)
                 if send_data and read_lenght>int(self.offset):
-                    try:
-                        send_message=require_data_type().file_message_type(self.file,os.path.getsize(self.file),self.Src_name,self.Dst_name,send_data)
-                        network_send_message(self.service_socket,self.message)
-                        
-                    except:
-                        if True:
-                            break
-                    else:
-                        read_lenght=+len(send_data)
-                    break                                
-                elif read_lenght<=int(self.offset):
-                    continue
+                    send_message=require_data_type().file_message_type(self.file,os.path.getsize(self.file),self.Src_name,self.Dst_name,send_data)
+                    network_send_message(self.service_socket,send_message)
+                    print(send_message)
+                    read_lenght=+len(send_data)
+                    break
                 
 """
     def reciver_message(self):
@@ -637,6 +633,7 @@ class file_revicer(object):
     def __init__(self,filename=None,service=None):
         self.filename=filename
         self.service_socket=service
+        self.file=os.path.basename(self.filename)
         #得到文件名和文件路径
         #self.filepath=os.path.dirname(self.file)
         #self.filename=os.path.basename(self.file)
