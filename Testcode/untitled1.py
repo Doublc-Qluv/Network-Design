@@ -617,7 +617,7 @@ class file_send(object):
                 #当当前文件已读的长度等于偏移量
                 if send_data and read_lenght==int(self.offset):
                     print('1222')
-                    send_message=require_data_type().file_message_type(self.file,os.path.getsize(self.file),self.Src_name,self.Dst_name,send_data)
+                    send_message=require_data_type().file_message_type(self.file,os.path.getsize(self.file),self.Src_name,self.Dst_name,str(send_data))
                     network_send_message(self.service_socket,send_message).send_file_message()
                     print(send_message)
                     break
