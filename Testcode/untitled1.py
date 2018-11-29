@@ -361,9 +361,29 @@ class user_frame(tk.Frame):   #继承frame类
                     self.whole_user=eval(self.message['WholeUserList'])
                     self.user_name_list_updata()
                 elif self.message['Head']=='file':
-                    pass
-        #self.message_page[i].show_message_frame.after(500,self.message_update)
+                    if eval(self.message['Flag'])==1:
+                        self.message_page[i].message_list.insert(tk.END,ctime().rjust(35))
+                        self.message_page[i].message_list.insert(tk.END,self.message['Src_name']+':'+'发送文件完成!')
+                    elif eval(self.message['Flag'])==2 or eval(self.message['Flag'])==0:
+                        self.message_page[i].message_list.insert(tk.END,ctime().rjust(35))
+                        self.message_page[i].message_list.insert(tk.END,self.message['Src_name']+':'+'文件已有%s'%self.message['offset'])
+                        self.file_message_thread=threading.Thread(target=file_send,args=(self.message['filename'],self.service_socket,self.message['offset'],self.message['Dst_name'],self.message['Src_name']))
+                        self.file_message_thread.start()
 
+        #self.message_page[i].show_message_frame.after(500,self.message_update)
+"""
+def file():
+    filepath='c:'
+    if message['Head']=='file':
+       filename='/'.join((filepath, os.path.basename(message['filename'])))
+       if os.path.exists(filename):
+           if os.path.getsize(filename)==eval(message['file_size']):
+               sk.send('已完整存在')   1
+            else:
+                sk.send('偏移量')    2
+        else:
+            sk.send()    0
+"""
 
 """
         self.dict['Head']='file'
@@ -378,24 +398,11 @@ class user_frame(tk.Frame):   #继承frame类
         self.dict['Src_name']=Src_name
         self.dict['Dst_name']=Dst_name
         self.dict['filename']=file
-        self.dict['file_size']=size
+        self.dict['filesize']=size
+        self.dict['content']=content
         return self.dict
 """
-"""
-def file():
-    filepath='c:'
-    if message['Head']=='file':
-       filename='/'.join((filepath, os.path.basename(message['filename'])))
-       if os.path.exists(filename):
-           if os.path.getsize(filename)==eval(message['file_size']):
-               sk.send('已完整存在')   1
-            else:
-                sk.send('偏移量')    2
-        else:
-            sk.send()    0
 
-
-"""
 
 #消息框与文本框界面设计
 class message_frame(tk.Frame):
@@ -427,12 +434,9 @@ class message_frame(tk.Frame):
     #发文件命令
     def openfile(self):
         #显示打开文件对话框，返回文件名以及路径
-        self.filename=filedialog.askopenfilename(title='选择发送的文件',filetypes=[('Python','*.py *.pyw'),('All Files','*')])
+        self.filename=filedialog.askopenfilename(title='选择发送的文件',filetypes=[('Python','*.py *.pyw')])
         self.size=os.path.getsize(self.filename)
-        self.message=require_data_type().file_message_type(self.filename,self.size,self.myself_name,self.user_name)
-        print(self.message)
-        p=network_send_message(self.service_socket,self.message)
-        self.file_send_thread=threading.Thread(target=p.send_file_message)
+        file_send(self.filename,self.service_socket,0,self.user_name,self.myself_name)
         self.file_send_thread.start()
         #print(self.filename)
     
@@ -562,54 +566,53 @@ class require_data_type(object):
         self.dict['type']='POST'      #消息类型 
         return self.dict
     
-    def file_message_type(self,file,size,Src_name,Dst_name):
+    #文件消息
+    def file_message_type(self,file,size,Src_name,Dst_name,content):
         self.dict['Head']='file'
         self.dict['type']='POST'
         self.dict['Src_name']=Src_name
         self.dict['Dst_name']=Dst_name
         self.dict['filename']=file
         self.dict['file_size']=size
+        self.dict['content']=content
         return self.dict
     
+    #退出消息
     def quit_message(self,Src_name):
         self.dict['Head']='quit'
         self.dict['type']='POST'
         self.dict['Src_name']=Src_name
 
-
+#文件发送
 class file_send(object):
-    def __init__(self,file=None,service_socket=None,offset=None):
+    def __init__(self,file=None,service_socket=None,offset=None,Dst_name=None,Src_name=None):
         self.file=file
         self.service_socket=service_socket
         self.offset=offset
+        self.Src_name=Src_name
+        self.Dst_name=Dst_name
+        self.send()
     
     #发送文件
     def send(self):
         with open(self.file) as fd:
             read_lenght=0
             while True:
-                send_data=fd.read(1024)
+                send_data=fd.read(512)
                 if send_data and read_lenght>int(self.offset):
-                    ack_msg='SEND SIZE|%s'%len(send_data)
-                    self.service_socket.send(ack_msg.encode('utf-8'))
-                    self.client_ack=self.service_socket.recv(1024).decode('utf-8')
-                    if self.client_ack=='ready':
-                        try:
-                            self.service_socket.send(send_data)
-                        except:
-                            pass
-                        else:
-                            read_lenght=+len(send_data)                                
+                    try:
+                        send_message=require_data_type().file_message_type(os.path.getsize(self.file),self.Src_name,self.Dst_name,send_data)
+                        network_send_message(self.service_socket,self.message)
+                        
+                    except:
+                        if True:
+                            break
+                    else:
+                        read_lenght=+len(send_data)
+                    break                                
                 elif read_lenght<=int(self.offset):
                     continue
-                else:
-                    send_data='END'
-                    self.service_socket.send(send_data.encode('utf-8'))
-                    self.ack=self.service_socket.recv(1024).decode('utf-8')
-                    if self.ack=='ok':
-                        break
-                    else:
-                        pass
+                
 """
     def reciver_message(self):
         while True:
