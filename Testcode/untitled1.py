@@ -365,6 +365,37 @@ class user_frame(tk.Frame):   #继承frame类
         #self.message_page[i].show_message_frame.after(500,self.message_update)
 
 
+"""
+        self.dict['Head']='file'
+        self.dict['type']='GET'
+        self.dict['Flag']=1/0/2
+        self.dict['file']=file   #文件路径
+        self.dict['offset']=offset
+
+            def file_message_type(self,file,size,Src_name,Dst_name):
+        self.dict['Head']='file'
+        self.dict['type']='POST'
+        self.dict['Src_name']=Src_name
+        self.dict['Dst_name']=Dst_name
+        self.dict['filename']=file
+        self.dict['file_size']=size
+        return self.dict
+"""
+"""
+def file():
+    filepath='c:'
+    if message['Head']=='file':
+       filename='/'.join((filepath, os.path.basename(message['filename'])))
+       if os.path.exists(filename):
+           if os.path.getsize(filename)==eval(message['file_size']):
+               sk.send('已完整存在')   1
+            else:
+                sk.send('偏移量')    2
+        else:
+            sk.send()    0
+
+
+"""
 
 #消息框与文本框界面设计
 class message_frame(tk.Frame):
@@ -390,7 +421,7 @@ class message_frame(tk.Frame):
         self.button_send.pack(side=tk.BOTTOM,anchor=tk.E)
         self.text=scrolledtext.ScrolledText(self,width=68,height=11,wrap=tk.WORD)
         self.text.pack(side=tk.BOTTOM)
-        self.file_button=tk.Button(self,text='file',fg='blue',height=1,width=4,command=self.openfile)   #dia
+        self.file_button=tk.Button(self,text='send_file',fg='blue',height=1,width=4,command=self.openfile)   #dia
         self.file_button.pack(side=tk.BOTTOM,anchor=tk.W)
     
     #发文件命令
@@ -449,6 +480,7 @@ class About_me(tk.Frame):
         
     def page_close(self):
         network_send_message(self.service_socket,require_data_type().quit_message(self.myself)).send_qiut_message()
+        time.sleep(1)
         self.service_socket.close()
         self.root.destroy()
         #print(require_data_type().quit_message())
@@ -535,8 +567,8 @@ class require_data_type(object):
         self.dict['type']='POST'
         self.dict['Src_name']=Src_name
         self.dict['Dst_name']=Dst_name
-        self.dict['file']=file
-        self.dict['size']=size
+        self.dict['filename']=file
+        self.dict['file_size']=size
         return self.dict
     
     def quit_message(self,Src_name):
@@ -544,14 +576,6 @@ class require_data_type(object):
         self.dict['type']='POST'
         self.dict['Src_name']=Src_name
 
-
-"""
-        self.dict['Head']='file'
-        self.dict['type']='POST'
-        self.dict['Flag']=1/0/2
-        self.dict['file']=file
-        self.dict['offset']=offset
-"""
 
 class file_send(object):
     def __init__(self,file=None,service_socket=None,offset=None):
