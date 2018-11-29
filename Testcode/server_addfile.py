@@ -189,18 +189,18 @@ def ftpserv(sk,Data):
     #dict_fileback['Flag']=1/0/2
     #dict_fileback['filename']=file
     #dict_fileback['offset']=offset
-    
+    dict_fileback['file']=Data['filename']
     file_path = "D:/Network-Design/Testcode/"
     filename = '/'.join((file_path, os.path.basename(Data['filename'])))
     log = "%s.%s" % (filename,'log')#指定记录偏移日志文件名
     logname = os.path.join(file_path,log)   #定义日志路径
-    if os.path.exists(filename) and os.path.exists(logname):
+    if os.path.exists(filename):
         if os.path.getsize(filename) == eval(Data['filesize']):
             #sk.send('已完整存在')   
             dict_fileback['Flag'] = 1
             flag =1
             # 可以转发
-        elif os.path.getsize(logname):#需要断点续传
+        elif os.path.exists(filename) and os.path.exists(logname):#需要断点续传
             with open(logname) as f:
                 offset = f.read().strip()   #读取偏移量
                 # 发送offset
@@ -216,18 +216,17 @@ def ftpserv(sk,Data):
         dict_fileback['Flag'] = 0
         flag = 0 # 0 需要完整发送
     total_len = int(offset) # 计算偏移量大小 即从这个位置传输或者接收
-    while True:#断点/传输
         
-        if flag == 1:
-            os.remove(logname)
-            break
-        elif flag == 2:
-            recv_data = Data
-            total_len += len(recv_data)
+    if flag == 1:
+        os.remove(logname)# 文件完整或者完成删除log
+    elif flag == 2:
+        recv_data = Data['content']
+        total_len += len(recv_data)
         with open(filename,'ab') as fd:    #以追加的方式写入文件
             fd.write(recv_data)
         with open(logname,'w') as f:   #把已接收到的数据长度写入日志
             f.write(str(total_len))
+    
     clients[Data['Src_name']].send(str(dict_fileback).encode("utf-8") )
     # 转发到目的地址
     # clients[Data['Src_name']].send(str(dict_fileback).encode("utf-8") )
