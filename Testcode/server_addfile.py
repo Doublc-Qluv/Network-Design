@@ -280,7 +280,7 @@ def run(mysocket,addr):
             print(recvData['Src_name'])
             print(clients[recvData['Src_name']])
         elif dicData['Head']=='file':
-            pass
+            ftpserv(mysocket,dicData)
 
         elif dicData['Head']=='quit':
             del_onlist(dicData['Src_name'])
