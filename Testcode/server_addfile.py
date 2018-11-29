@@ -37,7 +37,7 @@ def del_onlist(username):
     dict_userold = dict_userold.pop(username)
     dict_userold.update(dict_userold)
     jsuser_add = json.dumps(dict_userold)
-    user_file2 = open('Usernow', 'w+') 
+    user_file2 = open('Usernow', 'r+') 
     user_file2.write(jsuser_add)
     user_file2.close()
 def onlinedict():
