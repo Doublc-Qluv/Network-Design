@@ -180,57 +180,59 @@ def register(db):
             user_file2.close()
     return dict_register
 
-def ftpserv(sk,Data):
-    print(Data)
-    # 上传暂存服务器
-    dict_fileback = {}
-    dict_fileback['Head'] = 'file'
-    dict_fileback['type'] = 'GET'
-    #dict_fileback['Flag']=1/0/2
-    #dict_fileback['filename']=file
-    #dict_fileback['offset']=offset
-    dict_fileback['file']=Data['filename']
-    file_path = "D:/Network-Design/Testcode/"
-    filename = '/'.join((file_path, os.path.basename(Data['filename'])))
-    log = "%s.%s" % (filename,'log')#指定记录偏移日志文件名
-    logname = os.path.join(file_path,log)   #定义日志路径
-    if os.path.exists(filename):
-        if os.path.getsize(filename) == eval(Data['filesize']):
-            #sk.send('已完整存在')   
-            dict_fileback['Flag'] = 1
-            flag =1
-            # 可以转发
-        elif os.path.exists(filename) and os.path.exists(logname):#需要断点续传
-            with open(logname) as f:
-                offset = f.read().strip()   #读取偏移量
-                # 发送offset
-            dict_fileback['offset'] = offset
-            dict_fileback['Flag'] = 2
-            flag = 2
+def ftpserv(sk):
+    while True:
+        Data = eval((sk.recv(1024)).decode('utf-8'))
+        print(Data)
+        # 上传暂存服务器
+        dict_fileback = {}
+        dict_fileback['Head'] = 'file'
+        dict_fileback['type'] = 'GET'
+        #dict_fileback['Flag']=1/0/2
+        #dict_fileback['filename']=file
+        #dict_fileback['offset']=offset
+        dict_fileback['file']=Data['filename']
+        file_path = "D:/Network-Design/Testcode/"
+        filename = '/'.join((file_path, os.path.basename(Data['filename'])))
+        log = "%s.%s" % (filename,'log')#指定记录偏移日志文件名
+        logname = os.path.join(file_path,log)   #定义日志路径
+        if os.path.exists(filename):
+            if os.path.getsize(filename) == eval(Data['filesize']):
+                #sk.send('已完整存在')   
+                dict_fileback['Flag'] = 1
+                flag =1
+                # 可以转发
+            elif os.path.exists(filename) and os.path.exists(logname):#需要断点续传
+                with open(logname) as f:
+                    offset = f.read().strip()   #读取偏移量
+                    # 发送offset
+                dict_fileback['offset'] = offset
+                dict_fileback['Flag'] = 2
+                flag = 2
+            else:
+                pass
         else:
-            pass
-    else:
-        offset = 0
-        dict_fileback['offset'] = offset
-        #sk.send()    
-        dict_fileback['Flag'] = 0
-        flag = 0 # 0 需要完整发送
-    total_len = int(offset) # 计算偏移量大小 即从这个位置传输或者接收
+            offset = 0
+            dict_fileback['offset'] = offset
+            #sk.send()    
+            dict_fileback['Flag'] = 0
+            flag = 0 # 0 需要完整发送
+        total_len = int(offset) # 计算偏移量大小 即从这个位置传输或者接收
+            
+        if flag == 1:
+            os.remove(logname)# 文件完整或者完成删除log
+        elif flag == 2:
+            recv_data = Data['content']
+            total_len += len(recv_data)
+            with open(filename,'ab') as fd:    #以追加的方式写入文件
+                fd.write(recv_data)
+            with open(logname,'w') as f:   #把已接收到的数据长度写入日志
+                f.write(str(total_len))
         
-    if flag == 1:
-        os.remove(logname)# 文件完整或者完成删除log
-    elif flag == 2:
-        recv_data = Data['content']
-        total_len += len(recv_data)
-        with open(filename,'ab') as fd:    #以追加的方式写入文件
-            fd.write(recv_data)
-        with open(logname,'w') as f:   #把已接收到的数据长度写入日志
-            f.write(str(total_len))
-    
-    clients[Data['Src_name']].send(str(dict_fileback).encode("utf-8"))
-    # 转发到目的地址
-    
-    # clients[Data['Src_name']].send(str(dict_fileback).encode("utf-8") )
+        clients[Data['Src_name']].send(str(dict_fileback).encode("utf-8"))
+        # 转发到目的地址
+        
+        # clients[Data['Src_name']].send(str(dict_fileback).encode("utf-8") )
 
 
 '''
@@ -276,12 +278,12 @@ def run(mysocket,addr):
                 'msg':recvData['msg']            
             }
             print(sendto)
-            clients[recvData['Dst_name']].send(str(sendto).encode("utf-8") )
-            print(recvData['Src_name'])
-            print(clients[recvData['Src_name']])
+            if not clients[recvData['Dst_name']]:
+                clients[recvData['Dst_name']].send(str(sendto).encode("utf-8") )
         elif dicData['Head']=='file':
-            ftpserv(mysocket,dicData)
-
+            #ftpserv(mysocket,dicData)
+            ft = threading.Thread(target=ftpserv, args=(mysocket,dicData))
+            ft.start()
         elif dicData['Head']=='quit':
             del_onlist(dicData['Src_name'])
             mysocket.send(str(dicData).encode('utf-8'))
