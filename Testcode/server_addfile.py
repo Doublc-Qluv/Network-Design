@@ -180,23 +180,67 @@ def register(db):
             user_file2.close()
     return dict_register
 
-def ftpserv(Data):
+def ftpserv(sk,Data):
     print(Data)
+    # 上传暂存服务器
+    dict_fileback = {}
+    dict_fileback['Head'] = 'file'
+    dict_fileback['type'] = 'GET'
+    #dict_fileback['Flag']=1/0/2
+    #dict_fileback['filename']=file
+    #dict_fileback['offset']=offset
+    
+    file_path = "D:/Network-Design/Testcode/"
+    filename = '/'.join((file_path, os.path.basename(Data['filename'])))
+    log = "%s.%s" % (filename,'log')#指定记录偏移日志文件名
+    logname = os.path.join(file_path,log)   #定义日志路径
+    if os.path.exists(filename) and os.path.exists(logname):
+        if os.path.getsize(filename) == eval(Data['filesize']):
+            #sk.send('已完整存在')   
+            dict_fileback['Flag'] = 1
+            flag =1
+            # 可以转发
+        elif os.path.getsize(logname):#需要断点续传
+            with open(logname) as f:
+                offset = f.read().strip()   #读取偏移量
+                # 发送offset
+            dict_fileback['offset'] = offset
+            dict_fileback['Flag'] = 2
+            flag = 2
+        else:
+            pass
+    else:
+        offset = 0
+        dict_fileback['offset'] = offset
+        #sk.send()    
+        dict_fileback['Flag'] = 0
+        flag = 0 # 0 需要完整发送
+    total_len = int(offset) # 计算偏移量大小 即从这个位置传输或者接收
+    while True:#断点/传输
+        
+        if flag == 1:
+            os.remove(logname)
+            break
+        elif flag == 2:
+            recv_data = Data
+            total_len += len(recv_data)
+        with open(filename,'ab') as fd:    #以追加的方式写入文件
+            fd.write(recv_data)
+        with open(logname,'w') as f:   #把已接收到的数据长度写入日志
+            f.write(str(total_len))
+    clients[Data['Src_name']].send(str(dict_fileback).encode("utf-8") )
+    # 转发到目的地址
+    #clients[Data['Src_name']].send(str(dict_fileback).encode("utf-8") )
 
-    if not Data:
-        break
-    elif Data:
-        pass
 
-
-    '''
+'''
         def file_message_type(self,file,size,Src_name,Dst_name):
         self.dict['Head']='file'
         self.dict['type']='POST'
         self.dict['Src_name']=Src_name
         self.dict['Dst_name']=Dst_name
-        self.dict['file']=file
-        self.dict['size']=size
+        self.dict['filename']=file
+        self.dict['filesize']=size
         return self.dict
 
         needback        
@@ -204,17 +248,11 @@ def ftpserv(Data):
         self.dict['Head']='file'
         self.dict['type']='POST'
         self.dict['Flag']=1/0/2
-        self.dict['file']=file
+        self.dict['filename']=file
         self.dict['offset']=offset
 
-            '''
+'''
 def run(mysocket,addr):
-    ''' 
-    recvData = mysocket.recv(1024)
-    clients[recvData] = mysocket
-    print(clients[recvData])
-    '''
-
     while True:
         recvmsg = mysocket.recv(1024)
         #把接收到的数据进行解码 

@@ -193,7 +193,6 @@ def run(mysocket,addr):
         #把接收到的数据进行解码 
         dicData = eval(recvmsg.decode('utf-8'))
         # receive = input()
-        dicData = dict(dicData)
         print(dicData)
 
         if dicData['Head'] == 'UserNameList':
