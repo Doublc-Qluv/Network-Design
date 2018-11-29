@@ -361,14 +361,17 @@ class user_frame(tk.Frame):   #继承frame类
                     self.whole_user=eval(self.message['WholeUserList'])
                     self.user_name_list_updata()
                 elif self.message['Head']=='file':
-                    if eval(self.message['Flag'])==1:
-                        self.message_page[i].message_list.insert(tk.END,ctime().rjust(35))
-                        self.message_page[i].message_list.insert(tk.END,self.message['Src_name']+':'+'发送文件完成!')
-                    elif eval(self.message['Flag'])==2 or eval(self.message['Flag'])==0:
-                        self.message_page[i].message_list.insert(tk.END,ctime().rjust(35))
-                        self.message_page[i].message_list.insert(tk.END,self.message['Src_name']+':'+'文件已有%s'%self.message['offset'])
-                        self.file_message_thread=threading.Thread(target=file_send,args=(self.message['filename'],self.service_socket,self.message['offset'],self.message['Dst_name'],self.message['Src_name']))
-                        self.file_message_thread.start()
+                    for i in range(len(self.message_page)):
+                        if eval(self.var.get())[i].split(' ')[0]==self.message['Src_name']:
+                            if self.message['Flag']==1:
+                                self.message_page[i].message_list.insert(tk.END,ctime().rjust(35))
+                                self.message_page[i].message_list.insert(tk.END,self.message['Src_name']+':'+'发送文件完成!')
+                            elif self.message['Flag']==2 or self.message['Flag']==0:
+                                self.message_page[i].message_list.insert(tk.END,ctime().rjust(35))
+                                self.message_page[i].message_list.insert(tk.END,self.message['Src_name']+':'+'文件已有%s'%self.message['offset'])
+                                self.file_message_thread=threading.Thread(target=file_send,args=(self.message['filename'],self.service_socket,self.message['offset'],self.message['Dst_name'],self.message['Src_name']))
+                                self.file_message_thread.start()
+                            break
 
         #self.message_page[i].show_message_frame.after(500,self.message_update)
 """
@@ -517,7 +520,6 @@ class network_send_message(object):
         #print('2')
         self.service_socket.send(str(self.message).encode('utf-8'))
 
-    
     def send_file_message(self):
         self.service_socket.send(str(self.message).encode('utf-8'))
         
@@ -580,7 +582,7 @@ class require_data_type(object):
         self.dict['Src_name']=Src_name
         self.dict['Dst_name']=Dst_name
         self.dict['filename']=file
-        self.dict['file_size']=size
+        self.dict['filesize']=size
         self.dict['content']=content
         return self.dict
     
@@ -611,7 +613,7 @@ class file_send(object):
                 #当当前文件已读的长度等于偏移量
                 if send_data and read_lenght==int(self.offset):
                     send_message=require_data_type().file_message_type(self.file,os.path.getsize(self.file),self.Src_name,self.Dst_name,send_data)
-                    network_send_message(self.service_socket,send_message)
+                    network_send_message(self.service_socket,send_message).send_file_message()
                     print(send_message)
                     read_lenght=+len(send_data)
                     break
