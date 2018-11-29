@@ -2,7 +2,7 @@ import hashlib
 import sys,os
 # from PIL import Image, ImageFont, ImageDraw, ImageFilter
 # import random
-import socket, threading
+import socket, threading,socketserver
 import json
 import re
 import time
@@ -128,5 +128,5 @@ def onlinedict():
 print(onlinedict())
 ''' 
 
-s = "['root', 'sam', 'asdf']"
-s = eval(s)
+file_path = os.path.join(os.path.abspath('.'),'file')
+print(file_path)

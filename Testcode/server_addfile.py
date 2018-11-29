@@ -8,7 +8,7 @@ import re
 import socketserver
 
 clients = {}    #提供 用户名->socket 映射
-chatwith = {}   #提供通信双方映射
+file_path = os.path.join(os.path.abspath('.'),'file')
 def add_onlist(dic,hostport):
     username = dic['username'] #input('输入你的用户名\n')
     # user_file = open('account.txt','r')  # 打开读取用户文件
@@ -180,7 +180,30 @@ def register(db):
             user_file2.close()
     return dict_register
 
+def ftpserv(Data):
+    print(Data)
+    
 
+
+    '''
+        def file_message_type(self,file,size,Src_name,Dst_name):
+        self.dict['Head']='file'
+        self.dict['type']='POST'
+        self.dict['Src_name']=Src_name
+        self.dict['Dst_name']=Dst_name
+        self.dict['file']=file
+        self.dict['size']=size
+        return self.dict
+
+        needback        
+
+        self.dict['Head']='file'
+        self.dict['type']='POST'
+        self.dict['Flag']=1/0/2
+        self.dict['file']=file
+        self.dict['offset']=offset
+
+            '''
 def run(mysocket,addr):
     ''' 
     recvData = mysocket.recv(1024)
@@ -193,7 +216,6 @@ def run(mysocket,addr):
         #把接收到的数据进行解码 
         dicData = eval(recvmsg.decode('utf-8'))
         # receive = input()
-        dicData = dict(dicData)
         print(dicData)
 
         if dicData['Head'] == 'UserNameList':
@@ -217,25 +239,7 @@ def run(mysocket,addr):
             print(clients[recvData['Src_name']])
         elif dicData['Head']=='file':
             pass
-            '''
-        def file_message_type(self,file,size,Src_name,Dst_name):
-        self.dict['Head']='file'
-        self.dict['type']='POST'
-        self.dict['Src_name']=Src_name
-        self.dict['Dst_name']=Dst_name
-        self.dict['file']=file
-        self.dict['size']=size
-        return self.dict
 
-        needback        
-"""
-        self.dict['Head']='file'
-        self.dict['type']='POST'
-        self.dict['Flag']=1/0/2
-        self.dict['file']=file
-        self.dict['offset']=offset
-"""
-            '''
         elif dicData['Head']=='quit':
             del_onlist(dicData['Src_name'])
             mysocket.send(str(dicData).encode('utf-8'))
