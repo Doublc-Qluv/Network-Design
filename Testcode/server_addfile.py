@@ -278,7 +278,7 @@ def run(mysocket,addr):
                 'msg':recvData['msg']            
             }
             print(sendto)
-            if not clients[recvData['Dst_name']]:
+            if recvData['Dst_name'] in clients.keys():   
                 clients[recvData['Dst_name']].send(str(sendto).encode("utf-8") )
         elif dicData['Head']=='file':
             #ftpserv(mysocket,dicData)
