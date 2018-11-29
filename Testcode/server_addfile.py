@@ -27,17 +27,13 @@ def add_onlist(dic,hostport):
     user_file2.write(jsuser_add)
     user_file2.close()
 def del_onlist(username):
-    # user_file = open('account.txt','r')  # 打开读取用户文件
     user_file = open('Usernow', 'r+')
-    user_file.close()
-    # temp_file = open('Usernow','w') # 将在线用户写入一个表
     jsuser = user_file.read()
     dict_userold = json.loads(jsuser) # 导入旧表
-    # dict.update(dict2) # 这个函数可以更新字典
-    dict_userold = dict_userold.pop(username)
-    dict_userold.update(dict_userold)
+    user_file.close()
+    del dict_userold[str(username)]
     jsuser_add = json.dumps(dict_userold)
-    user_file2 = open('Usernow', 'r+') 
+    user_file2 = open('Usernow', 'w+') 
     user_file2.write(jsuser_add)
     user_file2.close()
 def onlinedict():
@@ -215,7 +211,8 @@ def ftpserv(Data):
             dict_fileback['Flag'] = 2
             flag = 2
             total_len = int(offset)
-            recv_data = Data['content']
+            recv_data = bytes(eval(Data['content']))
+            #recv_data = Data['content']
             total_len += len(recv_data)
             dict_fileback['offset'] = total_len
             with open(filename,'ab') as fd:    #以追加的方式写入文件
@@ -230,8 +227,8 @@ def ftpserv(Data):
         total_len = int(offset)
         dict_fileback['Flag'] = 0
         flag = 0 # 0 需要完整发送
-        
-        recv_data = Data['content']
+        recv_data = bytes(eval(Data['content']))
+        #recv_data = Data['content']
         total_len += len(recv_data)
         dict_fileback['offset'] = total_len
         with open(filename,'ab') as fd:    #以追加的方式写入文件
@@ -316,6 +313,8 @@ def run(mysocket,addr):
             #ft = threading.Thread(target=ftpserv, args=(dicData))
             #ft.start()
         elif dicData['Head']=='quit':
+            print('2')
+            print(dicData['Src_name'])
             del_onlist(dicData['Src_name'])
             mysocket.send(str(dicData).encode('utf-8'))
             mysocket.close()
