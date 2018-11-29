@@ -182,7 +182,11 @@ def register(db):
 
 def ftpserv(Data):
     print(Data)
-    
+
+    if not Data:
+        break
+    elif Data:
+        pass
 
 
     '''
