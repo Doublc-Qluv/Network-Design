@@ -442,7 +442,7 @@ class message_frame(tk.Frame):
     #发文件命令
     def openfile(self):
         #显示打开文件对话框，返回文件名以及路径
-        self.filename=filedialog.askopenfilename(title='选择发送的文件',filetypes=[('txt','*.txt')，('Python','*.py *.pyw')，('Python','*.py *.pyw')])
+        self.filename=filedialog.askopenfilename(title='选择发送的文件',filetypes=[('txt','*.txt'),('Python','*.py *.pyw')])
         self.file_message_thread=threading.Thread(target=file_send,args=(self.filename,self.service_socket,0,self.user_name,self.myself_name))
         self.file_message_thread.start()
         #file_send(self.filename,self.service_socket,0,self.user_name,self.myself_name)
