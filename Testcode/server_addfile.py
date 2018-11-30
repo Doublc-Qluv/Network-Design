@@ -240,7 +240,7 @@ def ftpserv(Data):
         recv_data = Data['content']
         print(recv_data)
         #recv_data = Data['content']
-        total_len += total_len+128
+        total_len = total_len+128
         dict_fileback['offset'] = total_len
         print(type(recv_data))
         print('3')
@@ -327,8 +327,8 @@ def run(mysocket,addr):
             if recvData['Dst_name'] in clients.keys():   
                 clients[recvData['Dst_name']].send(str(sendto).encode("utf-8") )
         elif dicData['Head']=='file':
-            #  ftpserv(dicData)
-            pass
+            ftpserv(dicData)
+            
             #ft = threading.Thread(target=ftpserv, args=(dicData))
             #ft.start()
         elif dicData['Head']=='quit':
