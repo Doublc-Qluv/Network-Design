@@ -6,9 +6,9 @@ import socket, threading
 import json
 import re
 import socketserver
-
+import codecs
 clients = {}    #提供 用户名->socket 映射
-file_path = os.path.join(os.path.abspath('.'),'file')
+# file_path = os.path.join(os.path.abspath('.'),'file')
 def add_onlist(dic,hostport):
     username = dic['username'] #input('输入你的用户名\n')
     # user_file = open('account.txt','r')  # 打开读取用户文件
@@ -196,13 +196,14 @@ def ftpserv(Data):
     #logname = os.path.join(file_path,log)   #定义日志路径
     print('a')
     offset=0
+    flag = -1
     if os.path.exists(filename):
         if os.path.getsize(filename) == Data['filesize']:
             #sk.send('已完整存在')   
             dict_fileback['Flag'] = 1
             flag =1
             # 可以转发
-        elif os.path.exists(filename) and os.path.exists(log):#需要断点续传
+        elif os.path.getsize(filename) < Data['filesize']:#需要断点续传
             with open(log) as f:
                 offset = f.read().strip()   #读取偏移量
                 print(offset)
@@ -216,9 +217,11 @@ def ftpserv(Data):
             total_len += len(recv_data)
             dict_fileback['offset'] = total_len
             with open(filename,'ab') as fd:    #以追加的方式写入文件
-                fd.write(recv_data)
+                fd.write(recv_data.decode('string_escape'))
             with open(log,'w') as f:   #把已接收到的数据长度写入日志
                 f.write(str(total_len))
+        else:
+            print('filerror')
 
     else:
         offset = 0
@@ -236,7 +239,7 @@ def ftpserv(Data):
         with open(log,'w') as f:   #把已接收到的数据长度写入日志
             f.write(str(total_len))
      # 计算偏移量大小 即从这个位置传输或者接收
-        
+
     if flag == 1:
         os.remove(log)# 文件完整或者完成删除log
         tosend = 1
@@ -309,7 +312,10 @@ def run(mysocket,addr):
             if recvData['Dst_name'] in clients.keys():   
                 clients[recvData['Dst_name']].send(str(sendto).encode("utf-8") )
         elif dicData['Head']=='file':
-            ftpserv(dicData)
+            try:
+                ftpserv(dicData)
+            except:
+                continue
             #ft = threading.Thread(target=ftpserv, args=(dicData))
             #ft.start()
         elif dicData['Head']=='quit':

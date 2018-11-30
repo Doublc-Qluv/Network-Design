@@ -126,7 +126,33 @@ def onlinedict():
     file.close()
     return dicnow
 print(onlinedict())
-''' 
+'''
 
-file_path = os.path.join(os.path.abspath('.'),'file')
-print(file_path)
+def add_onlist(dic,hostport):
+    username = dic['username'] #input('输入你的用户名\n')
+    # user_file = open('account.txt','r')  # 打开读取用户文件
+    user_file = open('Usernow', 'r+')
+    # temp_file = open('Usernow','w') # 将在线用户写入一个表
+    jsuser = user_file.read()
+    dict_userold = json.loads(jsuser) # 导入旧表
+    # dict.update(dict2) # 这个函数可以更新字典
+    user_file.close()
+    dict_add = {
+        username:hostport
+        }
+    dict_userold.update(dict_add)
+    jsuser_add = json.dumps(dict_userold)
+    user_file2 = open('Usernow', 'r+') 
+    user_file2.write(jsuser_add)
+    user_file2.close()
+def del_onlist(username):
+    user_file = open('Usernow', 'r+')
+    jsuser = user_file.read()
+    dict_userold = json.loads(jsuser) # 导入旧表
+    user_file.close()
+    del dict_userold[str(username)]
+    jsuser_add = json.dumps(dict_userold)
+    user_file2 = open('Usernow', 'w+') 
+    user_file2.write(jsuser_add)
+    user_file2.close()
+del_onlist('sam')
