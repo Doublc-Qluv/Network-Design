@@ -6,9 +6,9 @@ import socket, threading
 import json
 import re
 import socketserver
-
+import codecs
 clients = {}    #提供 用户名->socket 映射
-file_path = os.path.join(os.path.abspath('.'),'file')
+# file_path = os.path.join(os.path.abspath('.'),'file')
 def add_onlist(dic,hostport):
     username = dic['username'] #input('输入你的用户名\n')
     # user_file = open('account.txt','r')  # 打开读取用户文件
@@ -27,17 +27,13 @@ def add_onlist(dic,hostport):
     user_file2.write(jsuser_add)
     user_file2.close()
 def del_onlist(username):
-    # user_file = open('account.txt','r')  # 打开读取用户文件
     user_file = open('Usernow', 'r+')
-    user_file.close()
-    # temp_file = open('Usernow','w') # 将在线用户写入一个表
     jsuser = user_file.read()
     dict_userold = json.loads(jsuser) # 导入旧表
-    # dict.update(dict2) # 这个函数可以更新字典
-    dict_userold = dict_userold.pop(username)
-    dict_userold.update(dict_userold)
+    user_file.close()
+    del dict_userold[str(username)]
     jsuser_add = json.dumps(dict_userold)
-    user_file2 = open('Usernow', 'r+') 
+    user_file2 = open('Usernow', 'w+') 
     user_file2.write(jsuser_add)
     user_file2.close()
 def onlinedict():
@@ -200,13 +196,14 @@ def ftpserv(Data):
     #logname = os.path.join(file_path,log)   #定义日志路径
     print('a')
     offset=0
+    flag = -1
     if os.path.exists(filename):
         if os.path.getsize(filename) == Data['filesize']:
             #sk.send('已完整存在')   
             dict_fileback['Flag'] = 1
             flag =1
             # 可以转发
-        elif os.path.exists(filename) and os.path.exists(log):#需要断点续传
+        elif os.path.getsize(filename) < Data['filesize']:#需要断点续传
             with open(log) as f:
                 offset = f.read().strip()   #读取偏移量
                 print(offset)
@@ -215,13 +212,16 @@ def ftpserv(Data):
             dict_fileback['Flag'] = 2
             flag = 2
             total_len = int(offset)
-            recv_data = Data['content']
+            recv_data = bytes(eval(Data['content']))
+            #recv_data = Data['content']
             total_len += len(recv_data)
             dict_fileback['offset'] = total_len
             with open(filename,'ab') as fd:    #以追加的方式写入文件
-                fd.write(recv_data)
+                fd.write(recv_data.decode('string_escape'))
             with open(log,'w') as f:   #把已接收到的数据长度写入日志
                 f.write(str(total_len))
+        else:
+            print('filerror')
 
     else:
         offset = 0
@@ -230,8 +230,8 @@ def ftpserv(Data):
         total_len = int(offset)
         dict_fileback['Flag'] = 0
         flag = 0 # 0 需要完整发送
-        
-        recv_data = Data['content']
+        recv_data = bytes(eval(Data['content']))
+        #recv_data = Data['content']
         total_len += len(recv_data)
         dict_fileback['offset'] = total_len
         with open(filename,'ab') as fd:    #以追加的方式写入文件
@@ -239,7 +239,7 @@ def ftpserv(Data):
         with open(log,'w') as f:   #把已接收到的数据长度写入日志
             f.write(str(total_len))
      # 计算偏移量大小 即从这个位置传输或者接收
-        
+
     if flag == 1:
         os.remove(log)# 文件完整或者完成删除log
         tosend = 1
@@ -312,10 +312,15 @@ def run(mysocket,addr):
             if recvData['Dst_name'] in clients.keys():   
                 clients[recvData['Dst_name']].send(str(sendto).encode("utf-8") )
         elif dicData['Head']=='file':
-            ftpserv(dicData)
+            try:
+                ftpserv(dicData)
+            except:
+                continue
             #ft = threading.Thread(target=ftpserv, args=(dicData))
             #ft.start()
         elif dicData['Head']=='quit':
+            print('2')
+            print(dicData['Src_name'])
             del_onlist(dicData['Src_name'])
             mysocket.send(str(dicData).encode('utf-8'))
             mysocket.close()
