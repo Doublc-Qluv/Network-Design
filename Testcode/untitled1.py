@@ -630,7 +630,7 @@ class file_send(object):
                         read_lenght=read_lenght+len(send_data)
                         #send_data=fd.read(512)
             else:
-                send_data=' '
+                send_data=''
                 send_message=require_data_type().file_message_type(self.file,os.path.getsize(self.file),self.Src_name,self.Dst_name,str(send_data))
                 network_send_message(self.service_socket,send_message).send_file_message()
                 print('12220')
