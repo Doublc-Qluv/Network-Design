@@ -442,7 +442,7 @@ class message_frame(tk.Frame):
     #发文件命令
     def openfile(self):
         #显示打开文件对话框，返回文件名以及路径
-        self.filename=filedialog.askopenfilename(title='选择发送的文件',filetypes=[('Python','*.py *.pyw'),('txt','*.txt')])
+        self.filename=filedialog.askopenfilename(title='选择发送的文件',filetypes=[('txt','*.txt')，('Python','*.py *.pyw')，('Python','*.py *.pyw')])
         self.file_message_thread=threading.Thread(target=file_send,args=(self.filename,self.service_socket,0,self.user_name,self.myself_name))
         self.file_message_thread.start()
         #file_send(self.filename,self.service_socket,0,self.user_name,self.myself_name)
@@ -615,8 +615,8 @@ class file_send(object):
             while True:
                 send_data=fd.read(512)
                 print("aa")
-                #当当前文件已读的长度等于偏移量
-                if send_data and read_lenght==int(self.offset):
+                #当当前文件已读   从偏移量-512开始发送
+                if send_data and read_lenght==int(self.offset-512):
                     print('1222')
                     send_message=require_data_type().file_message_type(self.file,os.path.getsize(self.file),self.Src_name,self.Dst_name,str(send_data))
                     network_send_message(self.service_socket,send_message).send_file_message()
@@ -624,6 +624,7 @@ class file_send(object):
                     break
                 else:
                     read_lenght=read_lenght+len(send_data)
+                    #send_data=fd.read(512)
 """
     def reciver_message(self):
         while True:
