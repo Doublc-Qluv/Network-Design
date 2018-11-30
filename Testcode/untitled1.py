@@ -611,20 +611,26 @@ class file_send(object):
     #发送文件
     def send(self):
         with open(self.file,'rb') as fd:
-            read_lenght=0
-            while True:
-                send_data=fd.read(512)
-                print("aa")
-                #当当前文件已读   从偏移量-512开始发送
-                if send_data and read_lenght==int(self.offset-512):
-                    print('1222')
-                    send_message=require_data_type().file_message_type(self.file,os.path.getsize(self.file),self.Src_name,self.Dst_name,str(send_data))
-                    network_send_message(self.service_socket,send_message).send_file_message()
-                    print(send_message)
-                    break
-                else:
-                    read_lenght=read_lenght+len(send_data)
-                    #send_data=fd.read(512)
+            read_lenght=512
+            if self.offset:
+                while True:
+                    send_data=fd.read(512)
+                    print("aa")
+                    #当当前文件已读   从偏移量开始发送
+                    if send_data and read_lenght==int(self.offset):
+                        print('1222')
+                        send_message=require_data_type().file_message_type(self.file,os.path.getsize(self.file),self.Src_name,self.Dst_name,str(send_data))
+                        network_send_message(self.service_socket,send_message).send_file_message()
+                        print(send_message)
+                        break
+                    else:
+                        read_lenght=read_lenght+len(send_data)
+                        #send_data=fd.read(512)
+            else:
+                send_data=''
+                send_message=require_data_type().file_message_type(self.file,os.path.getsize(self.file),self.Src_name,self.Dst_name,str(send_data))
+                network_send_message(self.service_socket,send_message).send_file_message()
+                print('12220')
 """
     def reciver_message(self):
         while True:
