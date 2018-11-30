@@ -371,7 +371,7 @@ class user_frame(tk.Frame):   #继承frame类
                         for i in range(len(self.message_page)):
                             if eval(self.var.get())[i].split(' ')[0]==self.message['Dst_name']:
                                 self.message_page[i].message_list.insert(tk.END,ctime().rjust(35))
-                                self.message_page[i].message_list.insert(tk.END,self.message['Src_name']+':'+'文件已有%skb'%self.message['offset'])
+                                self.message_page[i].message_list.insert(tk.END,self.message['Src_name']+':'+'文件已有%sb'%self.message['offset'])
                                 self.file_message_thread=threading.Thread(target=file_send,args=(self.message['filename'],self.service_socket,self.message['offset'],self.message['Dst_name'],self.message['Src_name']))
                                 self.file_message_thread.start()
                                 print('1000001')
@@ -614,59 +614,28 @@ class file_send(object):
     #发送文件
     def send(self):
         with open(self.file,'rb') as fd:
-            read_lenght=512
+            read_lenght=128
             if self.offset:
                 while True:
-                    send_data=fd.read(512)
-                    print("aa")
+                    send_data=fd.read(128)
                     #当当前文件已读   从偏移量开始发送
                     if send_data and read_lenght==int(self.offset):
                         print('1222')
+                        send_data
                         send_message=require_data_type().file_message_type(self.file,os.path.getsize(self.file),self.Src_name,self.Dst_name,str(send_data))
                         network_send_message(self.service_socket,send_message).send_file_message()
                         print(send_message)
                         break
-                    else:
+                    elif send_data:
                         read_lenght=read_lenght+len(send_data)
                         #send_data=fd.read(512)
+                    else:
+                        break
             else:
                 send_data=''
-                send_message=require_data_type().file_message_type(self.file,os.path.getsize(self.file),self.Src_name,self.Dst_name,str(send_data))
+                send_message=require_data_type().file_message_type(self.file,os.path.getsize(self.file),self.Src_name,self.Dst_name,send_data)
                 network_send_message(self.service_socket,send_message).send_file_message()
-                print('12220')
-"""
-    def reciver_message(self):
-        while True:
-            self.return_message=eval(self.service_socket.recv(1024).decode('utf-8'))
-            if self.return_message['Head']=='':
-                pass
-            elif self.return_message['Head']=='':
-                pass
-            else:
-                pass
-        return self.return_message
-        
-        
-
-        self.service_socket.send('%s:%d'%(self.filename,self.size).encode('utf-8'))  #发送文件名和文件大小
-        self.if_has=self.service_socket.recv(1024).decode('utf-8')
-        if self.if=='no':
-            
-        sys_msg=1     #接受偏移量
- """       
-filepath='' 
-class file_revicer(object):
-    def __init__(self,filename=None,service=None):
-        self.filename=filename
-        self.service_socket=service
-        self.file=os.path.basename(self.filename)
-        #得到文件名和文件路径
-        #self.filepath=os.path.dirname(self.file)
-        #self.filename=os.path.basename(self.file)
-        self.filepath,self.filename=os.path.split(self.file)
-        self.size=os.path.getsize(self.file)
-       
-        
+                print('12220')       
         
 
 if __name__=="__main__":

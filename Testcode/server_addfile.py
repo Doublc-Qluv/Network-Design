@@ -215,17 +215,22 @@ def ftpserv(Data):
             total_len = int(offset)
             recv_data = Data['content']
             #recv_data = Data['content']
-            total_len += 512
+            total_len += 128
             dict_fileback['offset'] = total_len
-            if Data['content']:
+            print(type(recv_data))
+            if recv_data:
+                print('sasasa')
                 with open(filename,'ab') as fd:    #以追加的方式写入文件
-                    fd.write(recv_data.decode('string_escape'))
+                    print('asssss')
+                    #fd.write(bytes(recv_data,encoding='utf-8'))
+                    fd.write(eval(recv_data))
+                    print(type(recv_data))
             with open(log,'w') as f:   #把已接收到的数据长度写入日志
                 f.write(str(total_len))
         else:
             print('filerror')
     else:
-        offset = 512
+        offset = 128
         print('10')
         #dict_fileback['offset'] = offset
         #sk.send()    
@@ -235,8 +240,9 @@ def ftpserv(Data):
         recv_data = Data['content']
         print(recv_data)
         #recv_data = Data['content']
-        total_len += total_len+512
+        total_len += total_len+128
         dict_fileback['offset'] = total_len
+        print(type(recv_data))
         print('3')
         with open(filename,'w') as fd:    #以追加的方式写入文件
             fd.write(recv_data)
@@ -296,7 +302,9 @@ def run(mysocket,addr):
     while True:
         recvmsg = mysocket.recv(1024)
         #把接收到的数据进行解码 
-        dicData = eval(recvmsg.decode('utf-8'))
+        print(recvmsg.decode('utf-8'))
+        dicData = recvmsg.decode('utf-8')
+        dicData=eval(dicData)
         # receive = input()
         print(dicData)
 
