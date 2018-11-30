@@ -374,6 +374,7 @@ class user_frame(tk.Frame):   #继承frame类
                                 self.message_page[i].message_list.insert(tk.END,self.message['Src_name']+':'+'文件已有%skb'%self.message['offset'])
                                 self.file_message_thread=threading.Thread(target=file_send,args=(self.message['filename'],self.service_socket,self.message['offset'],self.message['Dst_name'],self.message['Src_name']))
                                 self.file_message_thread.start()
+                                print('1000001')
                                 break
 
         #self.message_page[i].show_message_frame.after(500,self.message_update)
@@ -496,13 +497,14 @@ class About_me(tk.Frame):
         tk.Button(self,text='qiut',command=self.page_close).pack()
         
     def page_close(self):
+        print('exiting')
         network_send_message(self.service_socket,require_data_type().quit_message(self.myself)).send_qiut_message()
+        print(require_data_type().quit_message(self.myself))
+        self.root.destroy()
         time.sleep(1)
         self.service_socket.close()
-        self.root.destroy()
         #print(require_data_type().quit_message())
         sys.exit(0)
-        pass
 
 
 
@@ -594,6 +596,7 @@ class require_data_type(object):
         self.dict['Head']='quit'
         self.dict['type']='POST'
         self.dict['Src_name']=Src_name
+        return self.dict
 
 
         
@@ -627,7 +630,7 @@ class file_send(object):
                         read_lenght=read_lenght+len(send_data)
                         #send_data=fd.read(512)
             else:
-                send_data=''
+                send_data=' '
                 send_message=require_data_type().file_message_type(self.file,os.path.getsize(self.file),self.Src_name,self.Dst_name,str(send_data))
                 network_send_message(self.service_socket,send_message).send_file_message()
                 print('12220')
