@@ -222,10 +222,9 @@ def ftpserv(Data):
                 f.write(str(total_len))
         else:
             print('filerror')
-
     else:
-        offset = 0
-        dict_fileback['offset'] = offset
+        offset = 512
+        #dict_fileback['offset'] = offset
         #sk.send()    
         total_len = int(offset)
         dict_fileback['Flag'] = 0
@@ -234,18 +233,16 @@ def ftpserv(Data):
         #recv_data = Data['content']
         total_len += len(recv_data)
         dict_fileback['offset'] = total_len
-        with open(filename,'ab') as fd:    #以追加的方式写入文件
+        with open(filename,'w') as fd:    #以追加的方式写入文件
             fd.write(recv_data)
         with open(log,'w') as f:   #把已接收到的数据长度写入日志
             f.write(str(total_len))
      # 计算偏移量大小 即从这个位置传输或者接收
-
-    if flag == 1:
-        os.remove(log)# 文件完整或者完成删除log
-        tosend = 1
-        
-
-
+    #if flag == 1:
+    #    os.remove(log)# 文件完整或者完成删除log
+    #    tosend = 1
+    print(dict_fileback)
+    print('fileBack')
     clients[Data['Src_name']].send(str(dict_fileback).encode("utf-8"))
     # 转发到目的地址
     
