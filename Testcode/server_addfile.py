@@ -325,9 +325,11 @@ def run(mysocket,addr):
             }
             print(sendto)
             if recvData['Dst_name'] in clients.keys():   
-                clients[recvData['Dst_name']].send(str(sendto).encode("utf-8") )
+                clients[recvData['Dst_name']].send(str(sendto).encode("utf-8"))
         elif dicData['Head']=='file':
-            ftpserv(dicData)
+            #ftpserv(dicData)
+            if dicData['Dst_name'] in clients.keys():   
+                clients[dicData['Dst_name']].send(recvmsg)
             
             #ft = threading.Thread(target=ftpserv, args=(dicData))
             #ft.start()

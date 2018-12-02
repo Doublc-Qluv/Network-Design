@@ -360,23 +360,29 @@ class user_frame(tk.Frame):   #继承frame类
                     self.whole_add,self.whole_delete=set(eval(self.message['WholeUserList']))-set(self.whole_user),set(self.whole_user)-set(eval(self.message['WholeUserList']))
                     self.whole_user=eval(self.message['WholeUserList'])
                     self.user_name_list_updata()
-                elif self.message['Head']=='file':
+                elif self.message['Head']=='file' and self.message['type']=='GET':
                     if self.message['Flag']==1:
                         for i in range(len(self.message_page)):
-                            if eval(self.var.get())[i].split(' ')[0]==self.message['Dst_name']:
+                            if eval(self.var.get())[i].split(' ')[0]==self.message['Src_name']:
                                 self.message_page[i].message_list.insert(tk.END,ctime().rjust(35))
                                 self.message_page[i].message_list.insert(tk.END,self.message['Src_name']+':'+'发送文件完成!')
                                 break
                     elif self.message['Flag']==2 or self.message['Flag']==0:
                         for i in range(len(self.message_page)):
-                            if eval(self.var.get())[i].split(' ')[0]==self.message['Dst_name']:
+                            if eval(self.var.get())[i].split(' ')[0]==self.message['Src_name']:
                                 self.message_page[i].message_list.insert(tk.END,ctime().rjust(35))
-                                self.message_page[i].message_list.insert(tk.END,self.message['Src_name']+':'+'文件已有%sb'%self.message['offset'])
+                                self.message_page[i].message_list.insert(tk.END,self.message['Src_name']+':'+'文件已发送%sb'%self.message['offset'])
                                 self.file_message_thread=threading.Thread(target=file_send,args=(self.message['filename'],self.service_socket,self.message['offset'],self.message['Dst_name'],self.message['Src_name']))
                                 self.file_message_thread.start()
                                 print('1000001')
                                 break
-
+                elif self.message['Head']=='file' and self.message['type']=='POST':
+                    for i in range(len(self.message_page)):
+                        if eval(self.var.get())[i].split(' ')[0]==self.message['Src_name']:
+                            self.message_page[i].message_list.insert(tk.END,ctime().rjust(35))
+                            self.message_page[i].message_list.insert(tk.END,self.message['Dst_name']+':'+os.path.basename(self.message['filename'])+'接受文件ing')
+                            break
+                    file_reciver(self.message,self.service_socket)
         #self.message_page[i].show_message_frame.after(500,self.message_update)
 """
 def file():
@@ -598,8 +604,16 @@ class require_data_type(object):
         self.dict['Src_name']=Src_name
         return self.dict
 
+    def file_reciver_type(self,Src_name,Dst_name,file,offset,flag):
+        self.dict['Head']='file'
+        self.dict['type']='GET'
+        self.dict['Flag']=flag
+        self.dict['offset']=offset
+        self.dict['filename']=file
+        self.dict['Src_name']=Src_name
+        self.dict['Dst_name']=Dst_name
+        return self.dict
 
-        
 #文件发送
 class file_send(object):
     def __init__(self,file=None,service_socket=None,offset=None,Dst_name=None,Src_name=None):
@@ -636,7 +650,46 @@ class file_send(object):
                 send_message=require_data_type().file_message_type(self.file,os.path.getsize(self.file),self.Src_name,self.Dst_name,send_data)
                 network_send_message(self.service_socket,send_message).send_file_message()
                 print('12220')       
-        
+
+class file_reciver(object):
+    def __init__(self,data,service_socket):
+        self.data=data
+        self.service_socket=service_socket
+        self.file_path='E:/'
+        self.filename = '/'.join((self.file_path, os.path.basename(self.data['filename'])))
+        self.log="%s.%s" % (self.filename.split('.')[0],'log')#指定记录偏移日志文件名
+        self.reciver()
+
+    def reciver(self):
+        if os.path.exists(self.filename):
+            if os.path.getsize(self.filename) == self.data['filesize']:
+                #sk.send('已完整存在')
+                self.message=require_data_type().file_reciver_type(self.data['Dst_name'],self.data['Src_name'],self.data['filename'],None,1)   
+            elif os.path.getsize(self.filename) < self.data['filesize']:#需要断点续传
+                with open(self.log) as f:
+                    offset = f.read().strip()   #读取偏移量
+                    # 发送offset
+                total_len = int(offset)
+                recv_data = self.data['content']
+                total_len += 128
+                if recv_data:
+                    with open(self.filename,'ab') as fd:    #以追加的方式写入文件
+                        fd.write(eval(recv_data))
+                with open(self.log,'w') as f:   #把已接收到的数据长度写入日志
+                    f.write(str(total_len))
+                self.message=require_data_type().file_reciver_type(self.data['Src_name'],self.data['Dst_name'],self.data['filename'],total_len,2)   
+            else:
+                print('filerror')
+        else: 
+            total_len = 0
+            recv_data = self.data['content']
+            total_len = total_len+128
+            with open(self.filename,'w') as fd:    #以追加的方式写入文件
+                fd.write(recv_data)
+            with open(self.log,'w') as f:   #把已接收到的数据长度写入日志
+                f.write(str(total_len))
+            self.message=require_data_type().file_reciver_type(self.data['Src_name'],self.data['Dst_name'],self.data['filename'],total_len,0)
+        network_send_message(self.service_socket,self.message).send_file_message()  
 
 if __name__=="__main__":
     root=tk.Tk()
