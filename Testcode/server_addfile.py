@@ -83,6 +83,7 @@ def verify(db,hostport):
     dict_passverify = {}
     dict_passverify['Head'] = 'login'
     dict_passverify['type'] = 'GET' 
+    dict_passverify['username']=name
     print(len(dict_userold))
     flag = len(dict_userold)
     for i in range(len(dict_userold)):
@@ -176,128 +177,7 @@ def register(db):
             user_file2.close()
     return dict_register
 
-def ftpserv(Data):
 
-    #Data = eval((sk.recv(1024)).decode('utf-8'))
-    print(Data)
-    # 上传暂存服务器
-    dict_fileback = {}
-    dict_fileback['Head'] = 'file'
-    dict_fileback['type'] = 'GET'
-    #dict_fileback['Flag']=1/0/2
-    #dict_fileback['filename']=file
-    #dict_fileback['offset']=offset
-    dict_fileback['filename'] = Data['filename']
-    dict_fileback['Src_name'] = Data['Src_name']
-    dict_fileback['Dst_name'] = Data['Dst_name']
-    #file_path = "D:/Network-Design/Testcode"
-    file_path='E:/'
-    filename = '/'.join((file_path, os.path.basename(Data['filename'])))
-    log = "%s.%s" % (filename.split('.')[0],'log')#指定记录偏移日志文件名
-    #logname = os.path.join(file_path,log)   #定义日志路径
-    #print('a')
-    offset=0
-    flag = -1
-    if os.path.exists(filename):
-        if os.path.getsize(filename) == Data['filesize']:
-            #sk.send('已完整存在')   
-            dict_fileback['Flag'] = 1
-            flag =1
-            # 可以转发
-        elif os.path.getsize(filename) < Data['filesize']:#需要断点续传
-            with open(log) as f:
-                offset = f.read().strip()   #读取偏移量
-                print(offset,' 12www')
-                # 发送offset
-            dict_fileback['offset'] = offset
-            dict_fileback['Flag'] = 2
-            flag = 2
-            total_len = int(offset)
-            recv_data = Data['content']
-            #recv_data = Data['content']
-            total_len += 128
-            dict_fileback['offset'] = total_len
-            print(type(recv_data))
-            if recv_data:
-                print('sasasa')
-                with open(filename,'ab') as fd:    #以追加的方式写入文件
-                    print('asssss')
-                    #fd.write(bytes(recv_data,encoding='utf-8'))
-                    fd.write(eval(recv_data))
-                    print(type(recv_data))
-            with open(log,'w') as f:   #把已接收到的数据长度写入日志
-                f.write(str(total_len))
-        else:
-            print('filerror')
-    else:
-        offset = 128
-        print('10')
-        #dict_fileback['offset'] = offset
-        #sk.send()    
-        total_len = 0
-        dict_fileback['Flag'] = 0
-        flag = 0 # 0 需要完整发送
-        recv_data = Data['content']
-        print(recv_data)
-        #recv_data = Data['content']
-        total_len = total_len+128
-        dict_fileback['offset'] = total_len
-        print(type(recv_data))
-        print('3')
-        with open(filename,'w') as fd:    #以追加的方式写入文件
-            fd.write(recv_data)
-            print(type(recv_data))
-        print('1')
-        with open(log,'w') as f:   #把已接收到的数据长度写入日志
-            f.write(str(total_len))
-        print('2')
-    clients[Data['Src_name']].send(str(dict_fileback).encode("utf-8"))
-    print('100')
-     # 计算偏移量大小 即从这个位置传输或者接收
-    #if flag == 1:
-    #    os.remove(log)# 文件完整或者完成删除log
-    #    tosend = 1
-    print(dict_fileback)
-    print('fileBack')
-    #clients[Data['Src_name']].send(str(dict_fileback).encode("utf-8"))
-    # 转发到目的地址
-    
-    # clients[Data['Src_name']].send(str(dict_fileback).encode("utf-8") )
-'''    if tosend:
-        with open(filename,'rb') as fd:
-            read_lenght=0
-            while True:
-                send_data=fd.read(512)
-                #当当前文件已读的长度等于偏移量
-                if send_data and read_lenght==int(offset):
-                    send_message=require_data_type().file_message_type(file,os.path.getsize(file),Src_name,Dst_name,send_data)
-                    network_send_message(service_socket,send_message)
-                    print(send_message)
-                    read_lenght=+len(send_data)
-                    break
-                else:
-                    continue'''
-
-
-'''
-        def file_message_type(self,file,size,Src_name,Dst_name):
-        self.dict['Head']='file'
-        self.dict['type']='POST'
-        self.dict['Src_name']=Src_name
-        self.dict['Dst_name']=Dst_name
-        self.dict['filename']=file
-        self.dict['filesize']=size
-        return self.dict
-
-        needback        
-
-        self.dict['Head']='file'
-        self.dict['type']='POST'
-        self.dict['Flag']=1/0/2
-        self.dict['filename']=file
-        self.dict['offset']=offset
-
-'''
 def run(mysocket,addr):
     while True:
         recvmsg = mysocket.recv(1024)
@@ -327,12 +207,8 @@ def run(mysocket,addr):
             if recvData['Dst_name'] in clients.keys():   
                 clients[recvData['Dst_name']].send(str(sendto).encode("utf-8"))
         elif dicData['Head']=='file':
-            #ftpserv(dicData)
             if dicData['Dst_name'] in clients.keys():   
                 clients[dicData['Dst_name']].send(recvmsg)
-            
-            #ft = threading.Thread(target=ftpserv, args=(dicData))
-            #ft.start()
         elif dicData['Head']=='quit':
             print('2')
             print(dicData['Src_name'])
@@ -340,15 +216,17 @@ def run(mysocket,addr):
             mysocket.send(str(dicData).encode('utf-8'))
             mysocket.close()
             print('%s logout' % dicData['Src_name'])
-            break
+            break   
+        else:
+            print('error')
+"""
         elif recvmsg <= 0:
             del_onlist(dicData['Src_name'])
             mysocket.send(str(dicData).encode('utf-8'))
             mysocket.close()
             print('%s logout' % dicData['Src_name'])
-            break            
-        else:
-            print('error')
+            break         
+        """
         # mysocket.send(str(a).encode('utf-8'))
 
 def start():
@@ -381,7 +259,7 @@ def start():
             mysocket.send(str(a).encode('utf-8'))
             print(a)
             if a['Flag'] == 1:
-                username = dicData['username']
+                username = a['username']
                 clients[username] = mysocket
                 t = threading.Thread(target=run, args=(mysocket,addr))
                 t.start()
